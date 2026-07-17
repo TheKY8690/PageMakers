@@ -1,22 +1,36 @@
 {
-  "name": "pagemakers-init",
+  "name": "page-makers",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.6",
+    "@vanilla-extract/css": "^1.21.1",
+    "@vanilla-extract/next-plugin": "^2.5.2",
+    "drizzle-orm": "^0.45.2",
     "next": "16.2.10",
+    "postgres": "^3.4.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.81.0",
+    "three": "^0.185.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.185.1",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "typescript": "^5"
