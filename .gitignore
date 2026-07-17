@@ -51,3 +51,16 @@ drizzle/meta
 # supabase
 supabase/.branches
 supabase/.temp
+
+# env (bare .env without suffix)
+.env
+
+# Windows
+Thumbs.db
+
+# misc logs
+*.log
+
+# test output
+test-results/
+playwright-report/
