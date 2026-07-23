@@ -5,7 +5,8 @@ import Preloader from './Preloader'
 import CustomCursor from './CustomCursor'
 import WaraNav from './WaraNav'
 import HeroSection from './HeroSection'
-import PinnedSections from './PinnedSections'
+import FeatureGrid from './FeatureGrid'
+import AboutStrip from './AboutStrip'
 import FeatureCards from './FeatureCards'
 import CtaSection from './CtaSection'
 
@@ -15,7 +16,7 @@ export default function WaraPage() {
   return (
     <div
       style={{
-        backgroundColor: '#14121A',
+        backgroundColor: '#0e0c18',
         color: '#ffffff',
         fontFamily: 'system-ui, -apple-system, sans-serif',
         minHeight: '100vh',
@@ -25,7 +26,8 @@ export default function WaraPage() {
       {!loaded && <Preloader onDone={() => setLoaded(true)} />}
       <WaraNav />
       <HeroSection />
-      <PinnedSections />
+      <FeatureGrid />
+      <AboutStrip />
       <FeatureCards />
       <CtaSection />
     </div>

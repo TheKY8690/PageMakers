@@ -2,7 +2,7 @@ import { style } from '@vanilla-extract/css'
 import { colors } from './tokens'
 
 export const section = style({
-  backgroundColor: colors.blackDeep,
+  backgroundColor: colors.bg,
   padding: '180px 7vw',
   display: 'flex',
   flexDirection: 'column',

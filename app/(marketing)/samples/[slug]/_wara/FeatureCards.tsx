@@ -1,58 +1,74 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useRef } from 'react'
+import Image from 'next/image'
+import { useScrollReveal } from '@/lib/hooks/useScrollReveal'
 import * as s from '@/styles/wara/features.css'
 
-gsap.registerPlugin(ScrollTrigger)
-
-const features = [
-  { icon: '◌', title: '일정', desc: '날짜·장소·인원을 한 번에. 반복 모임 템플릿도 지원해요.' },
-  { icon: '◎', title: '친구 초대', desc: '링크 하나로 초대. 회원가입 없이도 참석 의사 표현 가능.' },
-  { icon: '◆', title: 'DM & 그룹챗', desc: '모임 멤버들과 바로 대화. 사진·파일 공유도 OK.' },
-  { icon: '✦', title: '모임 피드', desc: '모임 사진과 후기를 함께 기록하고 추억으로 남기세요.' },
+const stories = [
+  {
+    tag: '생일 파티',
+    title: '소중한 사람의 생일을\n완벽하게 준비했어요',
+    desc: '장소 예약부터 참석 확인까지 와라 하나로 해결. 바쁜 친구들도 링크 하나로 바로 응답했어요.',
+    src: 'https://picsum.photos/seed/wara-s1/800/500',
+  },
+  {
+    tag: '스터디 모임',
+    title: '매주 반복되는 스터디를\n더 간편하게',
+    desc: '반복 모임 템플릿으로 매주 알림 자동 발송. 참석 여부가 한눈에 보여서 준비가 훨씬 쉬워졌어요.',
+    src: 'https://picsum.photos/seed/wara-s2/800/500',
+  },
+  {
+    tag: '친구 모임',
+    title: '오랜만에 만나는 친구들\n모두가 제때 왔어요',
+    desc: '자동 리마인더 덕분에 "나 깜빡했어"는 이제 옛말. 모임 전날 알림 한 번으로 다들 나타났어요.',
+    src: 'https://picsum.photos/seed/wara-s3/800/500',
+  },
 ]
 
-export default function FeatureCards() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.to(cardRefs.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 75%',
-        },
-      })
-    }, containerRef)
-
-    return () => ctx.revert()
-  }, [])
+function StoryCard({
+  story,
+  index,
+}: {
+  story: (typeof stories)[0]
+  index: number
+}) {
+  const { ref, isVisible } = useScrollReveal(0.2)
 
   return (
-    <section id="features" className={s.section} ref={containerRef}>
+    <div
+      ref={ref}
+      className={`${s.card}${isVisible ? ` ${s.cardVisible}` : ''}`}
+      style={{ transitionDelay: `${index * 0.12}s` }}
+    >
+      <div className={s.cardImgWrap}>
+        <Image
+          src={story.src}
+          alt={story.title}
+          fill
+          sizes="(max-width: 900px) 100vw, 33vw"
+          className={s.cardImg}
+        />
+      </div>
+      <div className={s.cardBody}>
+        <span className={s.tag}>{story.tag}</span>
+        <h3 className={s.cardTitle}>{story.title.replace('\\n', '\n')}</h3>
+        <p className={s.cardDesc}>{story.desc}</p>
+      </div>
+    </div>
+  )
+}
+
+export default function FeatureCards() {
+  return (
+    <section id="features" className={s.section}>
       <div className={s.header}>
-        <span className={s.tag}>기능</span>
-        <h2 className={s.title}>모임을 더 쉽게<br />만드는 기능들</h2>
+        <span className={s.eyebrow}>모임 이야기</span>
+        <h2 className={s.title}>와라와 함께한<br />실제 모임들</h2>
       </div>
       <div className={s.grid}>
-        {features.map(({ icon, title, desc }, i) => (
-          <div
-            key={title}
-            ref={(el) => { cardRefs.current[i] = el }}
-            className={s.card}
-          >
-            <span className={s.icon}>{icon}</span>
-            <h3 className={s.cardTitle}>{title}</h3>
-            <p className={s.cardDesc}>{desc}</p>
-          </div>
+        {stories.map((story, i) => (
+          <StoryCard key={story.tag} story={story} index={i} />
         ))}
       </div>
     </section>

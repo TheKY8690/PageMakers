@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import gsap from 'gsap'
 import * as s from '@/styles/wara/hero.css'
 
@@ -15,12 +16,7 @@ export default function HeroSection() {
       if (!el) return
       tl.to(
         el,
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power3.out',
-        },
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' },
         i * 0.12
       )
     })
@@ -29,7 +25,17 @@ export default function HeroSection() {
 
   return (
     <section className={s.section}>
-      <div>
+      <Image
+        src="https://picsum.photos/seed/wara-hero/1920/1080"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className={s.bgImage}
+      />
+      <div className={s.overlay} />
+
+      <div className={s.content}>
         {LINES.map((text, i) => (
           <div key={text} className={s.headlineWrap}>
             <span
@@ -41,9 +47,8 @@ export default function HeroSection() {
             </span>
           </div>
         ))}
+        <p className={s.sub}>준비의 부담을 만남의 설렘으로</p>
       </div>
-
-      <p className={s.sub}>준비의 부담을 만남의 설렘으로</p>
 
       <div className={s.scrollHint}>
         <span className={s.scrollLine} />

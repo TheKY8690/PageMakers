@@ -1,20 +1,44 @@
 import { style, keyframes } from '@vanilla-extract/css'
 import { colors } from './tokens'
 
-export const fadeUp = keyframes({
-  from: { opacity: 0, transform: 'translateY(30px)' },
-  to: { opacity: 1, transform: 'translateY(0)' },
+export const imgFadeIn = keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
 })
 
 export const section = style({
+  position: 'relative',
   minHeight: '100vh',
-  backgroundColor: colors.black,
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
-  padding: '0 7vw',
+  justifyContent: 'flex-end',
+  padding: '0 7vw 80px',
   overflow: 'hidden',
+})
+
+export const bgImage = style({
+  position: 'absolute',
+  inset: 0,
+  objectFit: 'cover',
+  animation: `${imgFadeIn} 1.2s ease forwards`,
+  zIndex: 0,
+})
+
+export const overlay = style({
+  position: 'absolute',
+  inset: 0,
+  background: `linear-gradient(
+    to top,
+    rgba(14,12,24,0.92) 0%,
+    rgba(14,12,24,0.5) 50%,
+    rgba(14,12,24,0.2) 100%
+  )`,
+  zIndex: 1,
+})
+
+export const content = style({
   position: 'relative',
+  zIndex: 2,
 })
 
 export const headlineWrap = style({
@@ -23,12 +47,12 @@ export const headlineWrap = style({
 
 export const headline = style({
   display: 'block',
-  fontSize: 'clamp(72px, 14vw, 200px)',
+  fontSize: 'clamp(56px, 11vw, 160px)',
   fontWeight: 700,
   fontStyle: 'italic',
   letterSpacing: '-0.04em',
   lineHeight: 0.92,
-  background: `linear-gradient(135deg, ${colors.snow} 0%, ${colors.purpleLight} 50%, ${colors.purple} 100%)`,
+  background: `linear-gradient(135deg, ${colors.white} 0%, ${colors.lavender} 60%, ${colors.purple} 100%)`,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   backgroundClip: 'text',
@@ -36,34 +60,35 @@ export const headline = style({
 })
 
 export const sub = style({
-  marginTop: '40px',
-  fontSize: 'clamp(14px, 1.3vw, 18px)',
-  color: colors.sub,
-  letterSpacing: '0.01em',
-  opacity: 0,
-  animation: `${fadeUp} 0.7s ease 1.2s forwards`,
+  marginTop: '28px',
+  fontSize: 'clamp(14px, 1.2vw, 17px)',
+  color: 'rgba(255,255,255,0.65)',
+  letterSpacing: '0.02em',
 })
 
 export const scrollHint = style({
   position: 'absolute',
   bottom: '40px',
-  left: '7vw',
+  right: '7vw',
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
-  gap: '12px',
+  gap: '10px',
+  zIndex: 2,
   opacity: 0,
-  animation: `${fadeUp} 0.5s ease 1.5s forwards`,
+  animation: `${imgFadeIn} 0.5s ease 2.2s forwards`,
 })
 
 export const scrollLine = style({
-  width: '40px',
-  height: '1px',
-  backgroundColor: colors.sub,
+  width: '1px',
+  height: '48px',
+  backgroundColor: 'rgba(255,255,255,0.4)',
 })
 
 export const scrollLabel = style({
-  fontSize: '11px',
-  color: colors.sub,
-  letterSpacing: '0.12em',
+  fontSize: '10px',
+  color: 'rgba(255,255,255,0.5)',
+  letterSpacing: '0.14em',
   textTransform: 'uppercase',
+  writingMode: 'vertical-rl',
 })
