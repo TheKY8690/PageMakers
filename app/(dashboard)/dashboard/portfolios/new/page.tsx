@@ -1,3 +1,10 @@
+import RequestForm from './RequestForm'
+
 export default function NewPortfolioPage() {
-  return <main>신규 요청 폼</main>;
+  return (
+    <main>
+      <h1>페이지 제작 요청</h1>
+      <RequestForm />
+    </main>
+  )
 }
