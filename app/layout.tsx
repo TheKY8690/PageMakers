@@ -12,6 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </head>
       <body>{children}</body>
     </html>
   );

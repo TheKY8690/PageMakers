@@ -3,38 +3,60 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { createPortfolioRequest } from './actions'
+import * as s from '@/styles/dashboard/requestForm.css'
 
 const schema = z.object({
   brandName: z.string().min(1, '브랜드명을 입력하세요'),
   brandDescription: z.string().min(1, '브랜드 설명을 입력하세요'),
-  brandColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, '올바른 색상을 선택하세요'),
 })
 
 type FormValues = z.infer<typeof schema>
 
 export default function RequestForm() {
   const [isPending, startTransition] = useTransition()
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [brandColors, setBrandColors] = useState<string[]>(['#000000'])
+  const [colorError, setColorError] = useState<string | null>(null)
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { brandColor: '#000000' },
-  })
+  } = useForm<FormValues>({ resolver: zodResolver(schema) })
+
+  function addColor() {
+    if (brandColors.length < 3) {
+      setBrandColors([...brandColors, '#000000'])
+    }
+  }
+
+  function removeColor(index: number) {
+    if (brandColors.length > 1) {
+      setBrandColors(brandColors.filter((_, i) => i !== index))
+    }
+  }
+
+  function updateColor(index: number, value: string) {
+    setBrandColors(brandColors.map((c, i) => (i === index ? value : c)))
+  }
 
   function onSubmit(values: FormValues) {
+    if (brandColors.length === 0) {
+      setColorError('브랜드 컬러를 최소 1개 선택하세요')
+      return
+    }
+    setColorError(null)
+
     startTransition(async () => {
       const formData = new FormData()
       formData.set('brandName', values.brandName)
       formData.set('brandDescription', values.brandDescription)
-      formData.set('brandColor', values.brandColor)
+      brandColors.forEach((c) => formData.append('brandColors', c))
 
-      const fileInput = document.querySelector<HTMLInputElement>('input[name="images"]')
-      if (fileInput?.files) {
-        for (const file of Array.from(fileInput.files)) {
+      if (fileRef.current?.files) {
+        for (const file of Array.from(fileRef.current.files)) {
           formData.append('images', file)
         }
       }
@@ -44,32 +66,99 @@ export default function RequestForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label>브랜드명</label>
-        <input {...register('brandName')} placeholder="브랜드명" />
-        {errors.brandName && <p>{errors.brandName.message}</p>}
+    <form className={s.form} onSubmit={handleSubmit(onSubmit)}>
+      <div className={s.field}>
+        <label className={s.label} htmlFor="brandName">브랜드명</label>
+        <input
+          id="brandName"
+          className={s.input}
+          {...register('brandName')}
+          placeholder="브랜드명"
+        />
+        {errors.brandName && <p className={s.errorText}>{errors.brandName.message}</p>}
       </div>
 
-      <div>
-        <label>브랜드 설명</label>
-        <textarea {...register('brandDescription')} placeholder="브랜드를 설명해 주세요" />
-        {errors.brandDescription && <p>{errors.brandDescription.message}</p>}
+      <div className={s.field}>
+        <label className={s.label} htmlFor="brandDescription">브랜드 설명</label>
+        <textarea
+          id="brandDescription"
+          className={s.textarea}
+          {...register('brandDescription')}
+          placeholder="브랜드를 설명해 주세요"
+        />
+        {errors.brandDescription && <p className={s.errorText}>{errors.brandDescription.message}</p>}
       </div>
 
-      <div>
-        <label>브랜드 컬러</label>
-        <input type="color" {...register('brandColor')} />
-        {errors.brandColor && <p>{errors.brandColor.message}</p>}
+      <div className={s.field}>
+        <span className={s.label}>브랜드 컬러</span>
+        <div className={s.colorList}>
+          {brandColors.map((color, index) => (
+            <div key={index} className={s.colorItem}>
+              <input
+                id={`brandColor-${index}`}
+                type="color"
+                className={s.colorPicker}
+                value={color}
+                onChange={(e) => updateColor(index, e.target.value)}
+                aria-label={`브랜드 컬러 ${index + 1}`}
+              />
+              <span className={s.colorHex}>{color.toUpperCase()}</span>
+              {brandColors.length > 1 && (
+                <button
+                  type="button"
+                  className={s.colorRemoveBtn}
+                  onClick={() => removeColor(index)}
+                  aria-label={`컬러 ${index + 1} 삭제`}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          {brandColors.length < 3 && (
+            <button
+              type="button"
+              className={s.colorAddBtn}
+              onClick={addColor}
+              aria-label="컬러 추가"
+            >
+              +
+            </button>
+          )}
+        </div>
+        {colorError && <p className={s.errorText}>{colorError}</p>}
       </div>
 
-      <div>
-        <label>이미지 업로드</label>
-        <input type="file" name="images" accept="image/*" multiple />
+      <div className={s.field}>
+        <label className={s.label}>이미지 업로드</label>
+        <label className={s.fileLabel} htmlFor="images">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>이미지 선택</span>
+          <span className={s.fileHint}>PNG, JPG, WEBP (여러 장 선택 가능)</span>
+        </label>
+        <input
+          id="images"
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className={s.fileInput}
+        />
       </div>
 
-      <button type="submit" disabled={isPending}>
-        {isPending ? '제출 중...' : '요청하기'}
+      <button type="submit" className={s.submitBtn} disabled={isPending}>
+        {isPending ? (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ animation: 'spin 0.8s linear infinite' }}>
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            제출 중...
+          </>
+        ) : '요청하기'}
       </button>
     </form>
   )
