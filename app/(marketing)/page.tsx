@@ -1,15 +1,23 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import * as s from '../../styles/landing/landing.css'
+import LandingPreloader from './LandingPreloader'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Module-level flag: resets on hard reload, persists across SPA navigation
+let introShown = false
+
 export default function LandingPage() {
+  const [ready, setReady] = useState(introShown)
+
   useEffect(() => {
+    if (!ready) return
+
     // ── Scroll restoration ───────────────────────────────────
     window.history.scrollRestoration = 'manual'
     window.scrollTo(0, 0)
@@ -68,10 +76,19 @@ export default function LandingPage() {
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill())
     }
-  }, [])
+  }, [ready])
 
   return (
     <>
+      {!ready && (
+        <LandingPreloader
+          onDone={() => {
+            introShown = true
+            setReady(true)
+          }}
+        />
+      )}
+
       {/* Nav */}
       <nav className={s.nav} data-nav>
         <Link href="/" className={s.navLogo}>PageMakers</Link>
