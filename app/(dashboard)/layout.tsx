@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import * as s from '../../styles/dashboard/layout.css'
 import NavLink from './NavLink'
 
@@ -9,7 +10,7 @@ export default function DashboardLayout({
   return (
     <div className={s.shell}>
       <aside className={s.sidebar}>
-        <span className={s.logo}>PageMakers</span>
+        <Link href="/" className={s.logo}>PageMakers</Link>
         <nav className={s.nav}>
           <NavLink href="/dashboard">요청 목록</NavLink>
           <NavLink href="/dashboard/portfolios/new">요청하기</NavLink>

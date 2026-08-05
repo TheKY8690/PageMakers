@@ -37,6 +37,8 @@ export const logo = style({
   fontWeight: 800,
   color: colors.primary,
   letterSpacing: '-0.02em',
+  textDecoration: 'none',
+  cursor: 'pointer',
 })
 
 export const nav = style({
