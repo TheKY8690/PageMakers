@@ -11,3 +11,13 @@ export const portfolioRequests = pgTable('portfolio_requests', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 })
+
+export const publishedPages = pgTable('published_pages', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  requestId: uuid('request_id').references(() => portfolioRequests.id).notNull(),
+  userId: uuid('user_id'),
+  username: text('username').notNull(),
+  slug: text('slug').notNull(),
+  templateId: text('template_id').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+})

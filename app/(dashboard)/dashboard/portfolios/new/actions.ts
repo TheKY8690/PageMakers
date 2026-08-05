@@ -26,12 +26,10 @@ export async function createPortfolioRequest(formData: FormData) {
     }
   }
 
-  await db.insert(portfolioRequests).values({
-    brandName,
-    brandDescription,
-    brandColors,
-    imageUrls,
-  })
+  const [inserted] = await db
+    .insert(portfolioRequests)
+    .values({ brandName, brandDescription, brandColors, imageUrls })
+    .returning({ id: portfolioRequests.id })
 
-  redirect('/dashboard')
+  redirect(`/dashboard/requests/${inserted.id}/preview`)
 }
