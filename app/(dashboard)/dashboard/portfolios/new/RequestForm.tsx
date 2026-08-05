@@ -65,8 +65,10 @@ export default function RequestForm() {
     })
   }
 
+  const handleFormSubmit = handleSubmit(onSubmit)
+
   return (
-    <form className={s.form} onSubmit={handleSubmit(onSubmit)}>
+    <form className={s.form} onSubmit={handleFormSubmit}>
       <div className={s.field}>
         <label className={s.label} htmlFor="brandName">브랜드명</label>
         <input

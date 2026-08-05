@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 import type { TemplateProps } from '@/lib/templates/types'
 
 export default function TemplateD({ brandName, brandDescription, brandColors, imageUrls }: TemplateProps) {
-  const primary = brandColors[0] ?? '#0F172A'
   const accent = brandColors[1] ?? brandColors[0] ?? '#0369A1'
 
   return (

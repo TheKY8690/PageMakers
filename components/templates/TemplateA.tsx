@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import type { TemplateProps } from '@/lib/templates/types'
 
 export default function TemplateA({ brandName, brandDescription, brandColors, imageUrls }: TemplateProps) {
