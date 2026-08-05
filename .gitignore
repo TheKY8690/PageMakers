@@ -58,6 +58,9 @@ supabase/.temp
 # Windows
 Thumbs.db
 
+# local notes
+TODO.md
+
 # misc logs
 *.log
 
