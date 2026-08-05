@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useRef, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { createPortfolioRequest } from './actions'
 import * as s from '@/styles/dashboard/requestForm.css'
 
@@ -16,7 +16,7 @@ type FormValues = z.infer<typeof schema>
 
 export default function RequestForm() {
   const [isPending, startTransition] = useTransition()
-  const fileRef = useRef<HTMLInputElement>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [brandColors, setBrandColors] = useState<string[]>(['#000000'])
   const [colorError, setColorError] = useState<string | null>(null)
 
@@ -54,21 +54,13 @@ export default function RequestForm() {
       formData.set('brandName', values.brandName)
       formData.set('brandDescription', values.brandDescription)
       brandColors.forEach((c) => formData.append('brandColors', c))
-
-      if (fileRef.current?.files) {
-        for (const file of Array.from(fileRef.current.files)) {
-          formData.append('images', file)
-        }
-      }
-
+      selectedFiles.forEach((file) => formData.append('images', file))
       await createPortfolioRequest(formData)
     })
   }
 
-  const handleFormSubmit = handleSubmit(onSubmit)
-
   return (
-    <form className={s.form} onSubmit={handleFormSubmit}>
+    <form className={s.form} onSubmit={handleSubmit(onSubmit)}>
       <div className={s.field}>
         <label className={s.label} htmlFor="brandName">브랜드명</label>
         <input
@@ -132,23 +124,23 @@ export default function RequestForm() {
       </div>
 
       <div className={s.field}>
-        <label className={s.label}>이미지 업로드</label>
+        <label className={s.label} htmlFor="images">이미지 업로드</label>
         <label className={s.fileLabel} htmlFor="images">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          <span>이미지 선택</span>
+          <span>{selectedFiles.length > 0 ? `${selectedFiles.length}개 선택됨` : '이미지 선택'}</span>
           <span className={s.fileHint}>PNG, JPG, WEBP (여러 장 선택 가능)</span>
         </label>
         <input
           id="images"
-          ref={fileRef}
           type="file"
           accept="image/*"
           multiple
           className={s.fileInput}
+          onChange={(e) => setSelectedFiles(Array.from(e.target.files ?? []))}
         />
       </div>
 
