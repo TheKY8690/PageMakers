@@ -16,15 +16,15 @@ export const shell = style({
 export const sidebar = style({
   backgroundColor: colors.white,
   borderRight: `1px solid ${colors.border}`,
-  padding: '24px 16px',
+  padding: '28px 20px',
   display: 'flex',
   flexDirection: 'column',
-  gap: '24px',
+  gap: '32px',
   '@media': {
     '(max-width: 768px)': {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: '12px 16px',
+      padding: '14px 20px',
       borderRight: 'none',
       borderBottom: `1px solid ${colors.border}`,
       gap: '16px',
@@ -33,10 +33,11 @@ export const sidebar = style({
 })
 
 export const logo = style({
-  fontSize: '18px',
+  fontSize: '16px',
   fontWeight: 800,
+  fontFamily: "'Archivo', system-ui, sans-serif",
   color: colors.primary,
-  letterSpacing: '-0.02em',
+  letterSpacing: '-0.04em',
   textDecoration: 'none',
   cursor: 'pointer',
 })
@@ -54,16 +55,15 @@ export const nav = style({
 })
 
 export const navLink = style({
-  padding: '10px 12px',
-  borderRadius: '8px',
+  padding: '10px 16px',
+  borderLeft: '3px solid transparent',
   color: colors.subText,
   fontSize: '14px',
   fontWeight: 500,
   textDecoration: 'none',
-  transition: 'background-color 0.15s ease, color 0.15s ease',
+  transition: 'color 0.15s ease, border-color 0.15s ease',
   selectors: {
     '&:hover': {
-      backgroundColor: colors.muted,
       color: colors.primary,
     },
   },
@@ -72,15 +72,9 @@ export const navLink = style({
 export const navLinkActive = style([
   navLink,
   {
-    backgroundColor: 'rgba(3,105,161,0.08)',
-    color: colors.accent,
-    fontWeight: 500,
-    selectors: {
-      '&:hover': {
-        backgroundColor: 'rgba(3,105,161,0.12)',
-        color: colors.accent,
-      },
-    },
+    borderLeft: `3px solid ${colors.primary}`,
+    color: colors.primary,
+    fontWeight: 600,
   },
 ])
 

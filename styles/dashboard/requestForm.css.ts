@@ -11,23 +11,24 @@ export const page = style({
 
 export const card = style({
   backgroundColor: colors.white,
-  borderRadius: '12px',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)',
+  border: `1px solid ${colors.border}`,
+  borderRadius: 0,
   padding: '40px',
   width: '100%',
   maxWidth: '560px',
   '@media': {
     '(max-width: 480px)': {
       padding: '24px 20px',
-      borderRadius: '8px',
     },
   },
 })
 
 export const heading = style({
   fontSize: '22px',
-  fontWeight: 700,
+  fontWeight: 800,
+  fontFamily: "'Archivo', system-ui, sans-serif",
   color: colors.primary,
+  letterSpacing: '-0.03em',
   marginBottom: '28px',
   lineHeight: 1.3,
 })
@@ -52,17 +53,16 @@ export const label = style({
 
 export const input = style({
   border: `1px solid ${colors.border}`,
-  borderRadius: '8px',
+  borderRadius: '2px',
   padding: '10px 14px',
   fontSize: '15px',
   color: colors.foreground,
   backgroundColor: colors.white,
   outline: 'none',
-  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+  transition: 'border-color 0.15s ease',
   selectors: {
     '&:focus-visible': {
-      borderColor: colors.accent,
-      boxShadow: `0 0 0 3px rgba(3,105,161,0.15)`,
+      borderColor: colors.primary,
     },
     '&::placeholder': {
       color: colors.disabled,
@@ -91,21 +91,22 @@ export const colorItem = style({
   alignItems: 'center',
   gap: '6px',
   backgroundColor: colors.muted,
-  borderRadius: '8px',
+  border: `1px solid ${colors.border}`,
+  borderRadius: '2px',
   padding: '6px 8px',
 })
 
 export const colorPicker = style({
   width: '44px',
   height: '44px',
-  borderRadius: '8px',
+  borderRadius: '2px',
   border: `1px solid ${colors.border}`,
   padding: '2px',
   cursor: 'pointer',
   backgroundColor: 'transparent',
   selectors: {
     '&:focus-visible': {
-      outline: `2px solid ${colors.accent}`,
+      outline: `2px solid ${colors.primary}`,
       outlineOffset: '2px',
     },
   },
@@ -145,7 +146,7 @@ export const colorAddBtn = style({
   width: '44px',
   height: '44px',
   border: `1.5px dashed ${colors.border}`,
-  borderRadius: '8px',
+  borderRadius: '2px',
   backgroundColor: 'transparent',
   color: colors.subText,
   cursor: 'pointer',
@@ -153,12 +154,11 @@ export const colorAddBtn = style({
   alignItems: 'center',
   justifyContent: 'center',
   fontSize: '20px',
-  transition: 'border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease',
+  transition: 'border-color 0.15s ease, color 0.15s ease',
   selectors: {
     '&:hover': {
-      borderColor: colors.accent,
-      backgroundColor: 'rgba(3,105,161,0.04)',
-      color: colors.accent,
+      borderColor: colors.primary,
+      color: colors.primary,
     },
   },
 })
@@ -170,16 +170,16 @@ export const fileLabel = style({
   justifyContent: 'center',
   gap: '8px',
   border: `1.5px dashed ${colors.border}`,
-  borderRadius: '8px',
+  borderRadius: '2px',
   padding: '32px 16px',
   cursor: 'pointer',
   color: colors.subText,
   fontSize: '14px',
-  transition: 'border-color 0.15s ease, background-color 0.15s ease',
+  transition: 'border-color 0.15s ease, color 0.15s ease',
   selectors: {
     '&:hover': {
-      borderColor: colors.accent,
-      backgroundColor: 'rgba(3,105,161,0.04)',
+      borderColor: colors.primary,
+      color: colors.primary,
     },
   },
 })
@@ -208,10 +208,10 @@ export const errorText = style({
 })
 
 export const submitBtn = style({
-  backgroundColor: colors.accent,
+  backgroundColor: colors.primary,
   color: colors.white,
   border: 'none',
-  borderRadius: '8px',
+  borderRadius: '2px',
   padding: '12px 20px',
   fontSize: '15px',
   fontWeight: 600,
@@ -221,14 +221,14 @@ export const submitBtn = style({
   alignItems: 'center',
   justifyContent: 'center',
   gap: '8px',
-  transition: 'background-color 0.15s ease',
+  transition: 'opacity 0.15s ease',
   marginTop: '8px',
   selectors: {
     '&:hover:not(:disabled)': {
-      backgroundColor: colors.accentHover,
+      opacity: 0.85,
     },
     '&:disabled': {
-      opacity: 0.6,
+      opacity: 0.4,
       cursor: 'not-allowed',
     },
   },

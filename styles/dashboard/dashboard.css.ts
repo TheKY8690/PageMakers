@@ -7,9 +7,11 @@ export const pageHeader = style({
 })
 
 export const pageTitle = style({
-  fontSize: '20px',
-  fontWeight: 700,
+  fontSize: '22px',
+  fontWeight: 800,
+  fontFamily: "'Archivo', system-ui, sans-serif",
   color: colors.primary,
+  letterSpacing: '-0.03em',
   margin: 0,
 })
 
@@ -52,25 +54,29 @@ export const row = style({
 
 export const badge = style({
   display: 'inline-block',
-  fontSize: '12px',
+  fontSize: '11px',
   fontWeight: 500,
-  borderRadius: '20px',
-  padding: '2px 10px',
+  borderRadius: '2px',
+  padding: '3px 8px',
+  border: '1px solid',
+  letterSpacing: '0.02em',
 })
 
 export const badgePending = style([
   badge,
   {
-    color: '#92400E',
-    backgroundColor: '#FEF3C7',
+    color: '#92500E',
+    backgroundColor: 'rgba(254,243,199,0.6)',
+    borderColor: 'rgba(180,120,0,0.25)',
   },
 ])
 
 export const badgeInProgress = style([
   badge,
   {
-    color: '#1E40AF',
-    backgroundColor: '#DBEAFE',
+    color: colors.primary,
+    backgroundColor: colors.muted,
+    borderColor: colors.border,
   },
 ])
 
@@ -78,7 +84,8 @@ export const badgeDone = style([
   badge,
   {
     color: '#065F46',
-    backgroundColor: '#D1FAE5',
+    backgroundColor: 'rgba(209,250,229,0.5)',
+    borderColor: 'rgba(0,100,50,0.2)',
   },
 ])
 
@@ -103,28 +110,30 @@ export const emptyStateText = style({
 
 export const ctaLink = style({
   display: 'inline-block',
-  backgroundColor: colors.accent,
+  backgroundColor: colors.primary,
   color: colors.white,
   textDecoration: 'none',
   padding: '10px 20px',
-  borderRadius: '8px',
+  borderRadius: '2px',
   fontSize: '14px',
   fontWeight: 600,
-  transition: 'background-color 0.15s ease',
+  transition: 'opacity 0.15s ease',
   selectors: {
     '&:hover': {
-      backgroundColor: colors.accentHover,
+      opacity: 0.85,
     },
   },
 })
 
 export const detailLink = style({
-  color: colors.accent,
+  color: colors.subText,
   textDecoration: 'none',
   fontSize: '13px',
   fontWeight: 500,
+  transition: 'color 0.15s ease',
   selectors: {
     '&:hover': {
+      color: colors.primary,
       textDecoration: 'underline',
     },
   },
