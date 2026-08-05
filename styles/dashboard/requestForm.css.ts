@@ -2,10 +2,9 @@ import { style } from '@vanilla-extract/css'
 import { colors } from './tokens'
 
 export const page = style({
-  minHeight: '100dvh',
   backgroundColor: colors.background,
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'center',
   padding: '40px 16px',
 })

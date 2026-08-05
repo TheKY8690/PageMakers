@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <style>{`body { margin: 0; } @keyframes spin { to { transform: rotate(360deg); } } * { scrollbar-width: none; } *::-webkit-scrollbar { display: none; }`}</style>
       </head>
       <body>{children}</body>
     </html>
