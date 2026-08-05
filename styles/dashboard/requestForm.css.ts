@@ -15,7 +15,7 @@ export const card = style({
   borderRadius: 0,
   padding: '40px',
   width: '100%',
-  maxWidth: '560px',
+  maxWidth: '800px',
   '@media': {
     '(max-width: 480px)': {
       padding: '24px 20px',
