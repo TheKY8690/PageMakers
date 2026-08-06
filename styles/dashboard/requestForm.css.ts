@@ -201,6 +201,67 @@ export const fileInput = style({
   border: 0,
 })
 
+export const radioGroup = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '8px',
+})
+
+export const radioInput = style({
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  padding: 0,
+  margin: '-1px',
+  overflow: 'hidden',
+  clip: 'rect(0,0,0,0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+})
+
+export const radioLabel = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '8px 14px',
+  border: `1.5px solid ${colors.border}`,
+  borderRadius: '2px',
+  fontSize: '14px',
+  color: colors.subText,
+  cursor: 'pointer',
+  userSelect: 'none',
+  transition: 'border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease',
+  selectors: {
+    '&:hover': {
+      borderColor: colors.primary,
+      color: colors.foreground,
+    },
+  },
+})
+
+export const radioLabelChecked = style([
+  radioLabel,
+  {
+    borderColor: colors.primary,
+    borderWidth: '2px',
+    color: colors.foreground,
+    backgroundColor: colors.muted,
+    fontWeight: 500,
+  },
+])
+
+export const requiredMark = style({
+  fontSize: '12px',
+  color: colors.error,
+  marginLeft: '4px',
+})
+
+export const optionalMark = style({
+  fontSize: '12px',
+  color: colors.subText,
+  marginLeft: '4px',
+  fontWeight: 400,
+})
+
 export const errorText = style({
   fontSize: '12px',
   color: colors.error,
