@@ -7,9 +7,11 @@ import { redirect } from 'next/navigation'
 
 export async function createPortfolioRequest(formData: FormData) {
   const brandName = formData.get('brandName') as string
+  const websiteType = formData.get('websiteType') as string
   const brandDescription = formData.get('brandDescription') as string
   const brandColors = formData.getAll('brandColors') as string[]
   const files = formData.getAll('images') as File[]
+  const additionalRequest = (formData.get('additionalRequest') as string) || null
 
   const supabase = await createClient()
 
@@ -28,7 +30,7 @@ export async function createPortfolioRequest(formData: FormData) {
 
   const [inserted] = await db
     .insert(portfolioRequests)
-    .values({ brandName, brandDescription, brandColors, imageUrls })
+    .values({ brandName, websiteType, brandDescription, brandColors, imageUrls, additionalRequest })
     .returning({ id: portfolioRequests.id })
 
   redirect(`/dashboard/requests/${inserted.id}/preview`)

@@ -5,8 +5,10 @@ export const portfolioRequests = pgTable('portfolio_requests', {
   userId: uuid('user_id'), // auth 구현 후 채울 예정
   brandName: text('brand_name').notNull(),
   brandDescription: text('brand_description').notNull(),
+  websiteType: text('website_type').notNull(),
   brandColors: text('brand_colors').array().notNull().default([]),
   imageUrls: text('image_urls').array().default([]),
+  additionalRequest: text('additional_request'),
   status: text('status').default('pending'), // pending | in_progress | done
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
