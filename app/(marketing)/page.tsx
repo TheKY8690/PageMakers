@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -14,11 +14,12 @@ let introShown = false
 
 export default function LandingPage() {
   const [ready, setReady] = useState(introShown)
+  const animatedRef = useRef(false)
 
-  useEffect(() => {
-    if (!ready) return
+  function startAnimations() {
+    if (animatedRef.current) return
+    animatedRef.current = true
 
-    // ── Scroll restoration ───────────────────────────────────
     window.history.scrollRestoration = 'manual'
     window.scrollTo(0, 0)
 
@@ -33,7 +34,6 @@ export default function LandingPage() {
       duration: 1.0,
       ease: 'power3.out',
       stagger: 0.08,
-      delay: 0.15,
     })
 
     // ── Hero fade-in elements ────────────────────────────────
@@ -45,7 +45,7 @@ export default function LandingPage() {
       duration: 0.9,
       ease: 'power3.out',
       stagger: 0.12,
-      delay: 0.35,
+      delay: 0.2,
     })
 
     // ── Section title clip reveal ────────────────────────────
@@ -72,16 +72,22 @@ export default function LandingPage() {
         }),
       start: 'top 88%',
     })
+  }
 
+  useEffect(() => {
+    if (!ready) return
+    startAnimations()
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill())
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready])
 
   return (
     <>
       {!ready && (
         <LandingPreloader
+          onAnimate={startAnimations}
           onDone={() => {
             introShown = true
             setReady(true)
@@ -110,22 +116,22 @@ export default function LandingPage() {
         <div className={s.heroRing2} aria-hidden="true" />
 
         <div className={s.heroContent}>
-          <p className={s.heroEyebrow} data-hero-el>Portfolio Page Service</p>
+          <p className={s.heroEyebrow} data-hero-el style={{ opacity: 0, transform: 'translateY(40px)' }}>Portfolio Page Service</p>
           <h1 className={s.heroLogo}>
             <span className={s.heroLogoClip}>
-              <span data-hero-char>Page</span>
+              <span data-hero-char style={{ display: 'inline-block', transform: 'translateY(110%)' }}>Page</span>
             </span>
             {' '}
             <span className={s.heroLogoClip}>
-              <span data-hero-char>Makers</span>
+              <span data-hero-char style={{ display: 'inline-block', transform: 'translateY(110%)' }}>Makers</span>
             </span>
           </h1>
-          <p className={s.heroTagline} data-hero-el>브랜드를 담은 포트폴리오 페이지</p>
-          <p className={s.heroSub} data-hero-el>
+          <p className={s.heroTagline} data-hero-el style={{ opacity: 0, transform: 'translateY(40px)' }}>브랜드를 담은 포트폴리오 페이지</p>
+          <p className={s.heroSub} data-hero-el style={{ opacity: 0, transform: 'translateY(40px)' }}>
             요청서 하나로, 전문가가 만드는 나만의 포트폴리오 페이지.<br />
             브랜드 컬러부터 소개까지 — 직접 만들 필요 없습니다.
           </p>
-          <Link href="/dashboard/portfolios/new" className={s.heroBtn} data-hero-el>
+          <Link href="/dashboard/portfolios/new" className={s.heroBtn} data-hero-el style={{ opacity: 0, transform: 'translateY(40px)' }}>
             지금 요청하기 →
           </Link>
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
 interface Props {
+  onAnimate: () => void
   onDone: () => void
 }
 
@@ -11,12 +12,13 @@ const LETTERS = ['P', 'a', 'g', 'e', '\u00A0', 'M', 'a', 'k', 'e', 'r', 's']
 const RADIUS = 150
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
-export default function LandingPreloader({ onDone }: Props) {
+export default function LandingPreloader({ onAnimate, onDone }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const circleRef = useRef<SVGCircleElement>(null)
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      onAnimate()
       setTimeout(onDone, 100)
       return
     }
@@ -50,8 +52,10 @@ export default function LandingPreloader({ onDone }: Props) {
       ease: 'power2.inOut',
     }, 1.2)
 
-    // Step 3: Radial reveal after circle completes
+    // Step 3: Radial reveal — start landing animations simultaneously
     tl.add(() => {
+      onAnimate() // landing animations start as reveal begins
+
       let r = 0
       const target = Math.hypot(window.innerWidth, window.innerHeight)
       const feather = 80
@@ -78,7 +82,7 @@ export default function LandingPreloader({ onDone }: Props) {
     return () => {
       tl.kill()
     }
-  }, [onDone])
+  }, [onAnimate, onDone])
 
   return (
     <div
