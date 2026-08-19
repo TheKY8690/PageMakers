@@ -28,6 +28,7 @@ export default async function EditRequestPage({ params }: Props) {
   const canEdit =
     request.status === 'pending' &&
     request.createdAt != null &&
+    // eslint-disable-next-line react-hooks/purity
     Date.now() - new Date(request.createdAt).getTime() < 24 * 60 * 60 * 1000
 
   if (!canEdit) redirect(`/dashboard/requests/${requestId}`)

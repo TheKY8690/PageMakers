@@ -45,6 +45,7 @@ export default async function RequestDetailPage({ params }: Props) {
   const canModify =
     status === 'pending' &&
     request.createdAt != null &&
+    // eslint-disable-next-line react-hooks/purity
     Date.now() - new Date(request.createdAt).getTime() < 24 * 60 * 60 * 1000
 
   // 이미지 signed URL 생성
