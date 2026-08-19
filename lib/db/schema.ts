@@ -1,4 +1,4 @@
-import { pgPolicy, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { jsonb, pgPolicy, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 export const portfolioRequests = pgTable(
@@ -10,7 +10,9 @@ export const portfolioRequests = pgTable(
     brandDescription: text('brand_description').notNull(),
     websiteType: text('website_type').notNull(),
     brandColors: text('brand_colors').array().notNull().default([]),
+    mainImageUrl: text('main_image_url'),
     imageUrls: text('image_urls').array().default([]),
+    contacts: jsonb('contacts').$type<{ type: string; value: string }[]>().default([]),
     additionalRequest: text('additional_request'),
     status: text('status').default('pending'), // pending | in_progress | done
     createdAt: timestamp('created_at').defaultNow(),
