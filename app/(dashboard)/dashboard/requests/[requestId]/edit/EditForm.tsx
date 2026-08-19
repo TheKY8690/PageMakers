@@ -8,7 +8,7 @@ import { getSignedUploadUrls, updateRequest } from '../actions'
 import * as s from '@/styles/dashboard/requestForm.css'
 
 const WEBSITE_TYPES = [
-  '회사·업체 홈페이지', '서비스 소개', '제품·상품 소개', '개인 포트폴리오',
+  '회사·업체 홈페이지', '서비스 소개', '제품·상품 소개', '프로필',
   '매장·공간 소개', '프로젝트·행사 소개', '기타',
 ] as const
 
@@ -166,7 +166,7 @@ export default function EditForm({ requestId, initial }: Props) {
       {/* 소개 */}
       <div className={s.field}>
         <label className={s.label} htmlFor="brandDescription">브랜드 또는 본인 소개<span className={s.requiredMark}>필수</span></label>
-        <textarea id="brandDescription" className={s.textarea} {...register('brandDescription')} />
+        <textarea id="brandDescription" className={s.textarea} placeholder={`좌우명:\n소개글:\n어필하고 싶은 이력:`} {...register('brandDescription')} />
         {errors.brandDescription && <p className={s.errorText}>{errors.brandDescription.message}</p>}
       </div>
 

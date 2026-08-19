@@ -36,7 +36,7 @@ const WEBSITE_TYPES = [
   '회사·업체 홈페이지',
   '서비스 소개',
   '제품·상품 소개',
-  '개인 포트폴리오',
+  '프로필',
   '매장·공간 소개',
   '프로젝트·행사 소개',
   '기타',
@@ -203,7 +203,7 @@ export default function RequestForm() {
           id="brandDescription"
           className={s.textarea}
           {...register('brandDescription')}
-          placeholder="상세하게 작성해주세요"
+          placeholder={`좌우명:\n소개글:\n어필하고 싶은 이력:`}
         />
         {errors.brandDescription && <p className={s.errorText}>{errors.brandDescription.message}</p>}
       </div>
