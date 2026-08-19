@@ -7,6 +7,7 @@ import * as s from '@/styles/dashboard/dashboard.css'
 export default async function AdminAnalyticsPage() {
   const { data: { users } } = await supabaseAdmin.auth.admin.listUsers()
 
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now()
   const DAY = 24 * 60 * 60 * 1000
   const dau = users.filter((u) => u.last_sign_in_at && now - new Date(u.last_sign_in_at).getTime() < DAY).length

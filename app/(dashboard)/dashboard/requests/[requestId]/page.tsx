@@ -5,10 +5,9 @@ import { portfolioRequests } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { and, eq } from 'drizzle-orm'
-import TemplatePicker from './preview/TemplatePicker'
 import { cancelRequest } from './actions'
+import TemplateSection from './TemplateSection'
 import * as s from '@/styles/dashboard/dashboard.css'
-import TemplatePreview from '@/components/TemplatePreview'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
   pending: { label: '대기중', className: s.badgePending },
@@ -194,40 +193,19 @@ export default async function RequestDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* 선택된 템플릿 프리뷰 */}
-      {request.selectedTemplateId && (
-        <div style={{ marginTop: '32px' }}>
-          <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '16px', letterSpacing: '-0.03em', marginBottom: '16px', color: '#0C0C0C' }}>
-            선택한 템플릿
-          </h2>
-          <TemplatePreview
-            templateId={request.selectedTemplateId}
-            brandName={request.brandName}
-            brandDescription={request.brandDescription}
-            brandColors={request.brandColors ?? []}
-            imageUrls={additionalSignedUrls.filter(Boolean) as string[]}
-          />
-        </div>
-      )}
-
-      {/* 템플릿 선택 */}
-      {status === 'template_selection' && !request.selectedTemplateId && (
-        <div style={{ marginTop: '32px' }}>
-          <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '18px', letterSpacing: '-0.03em', marginBottom: '8px', color: '#0C0C0C' }}>
-            템플릿 선택
-          </h2>
-          <p style={{ fontSize: '14px', color: 'rgba(12,12,12,0.45)', marginBottom: '24px' }}>
-            브랜드에 어울리는 스타일을 골라주세요
-          </p>
-          <TemplatePicker
-            requestId={requestId}
-            brandName={request.brandName}
-            brandDescription={request.brandDescription}
-            brandColors={request.brandColors ?? []}
-            imageUrls={request.imageUrls ?? []}
-          />
-        </div>
-      )}
+      {/* 템플릿 선택 / 프리뷰 */}
+      <TemplateSection
+        requestId={requestId}
+        status={status}
+        selectedTemplateId={request.selectedTemplateId ?? null}
+        brandName={request.brandName}
+        brandDescription={request.brandDescription}
+        brandColors={request.brandColors ?? []}
+        imageUrls={additionalSignedUrls.filter(Boolean) as string[]}
+        mainImageUrl={mainSignedUrl}
+        contacts={contacts}
+        websiteType={request.websiteType}
+      />
     </div>
   )
 }

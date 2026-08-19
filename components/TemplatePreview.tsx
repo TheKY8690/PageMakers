@@ -9,9 +9,12 @@ interface Props {
   brandDescription: string
   brandColors: string[]
   imageUrls: string[]
+  mainImageUrl?: string | null
+  contacts?: { type: string; value: string }[]
+  websiteType?: string
 }
 
-export default function TemplatePreview({ templateId, brandName, brandDescription, brandColors, imageUrls }: Props) {
+export default function TemplatePreview({ templateId, brandName, brandDescription, brandColors, imageUrls, mainImageUrl, contacts, websiteType }: Props) {
   const entry = templateRegistry[templateId as TemplateId]
   if (!entry) return null
 
@@ -27,6 +30,9 @@ export default function TemplatePreview({ templateId, brandName, brandDescriptio
               brandDescription={brandDescription}
               brandColors={brandColors}
               imageUrls={imageUrls}
+              mainImageUrl={mainImageUrl}
+              contacts={contacts}
+              websiteType={websiteType}
             />
           </div>
         </div>
