@@ -3,8 +3,6 @@ import type { TemplateProps, TemplateId } from './types'
 import TemplateA from '@/components/templates/TemplateA'
 import TemplateB from '@/components/templates/TemplateB'
 import TemplateC from '@/components/templates/TemplateC'
-import TemplateD from '@/components/templates/TemplateD'
-import TemplateE from '@/components/templates/TemplateE'
 
 export const templateRegistry: Record<TemplateId, {
   label: string
@@ -25,16 +23,6 @@ export const templateRegistry: Record<TemplateId, {
     label: '스타일 C',
     description: '센터 정렬 미니멀 + 매거진 갤러리',
     component: TemplateC,
-  },
-  'template-d': {
-    label: '스타일 D',
-    description: '다크 모드 + 색상 쇼케이스',
-    component: TemplateD,
-  },
-  'template-e': {
-    label: '스타일 E',
-    description: '매거진 스타일 + 이미지 히어로',
-    component: TemplateE,
   },
 }
 

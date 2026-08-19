@@ -4,9 +4,9 @@ import { db } from '@/lib/db'
 import { portfolioRequests } from '@/lib/db/schema'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { eq } from 'drizzle-orm'
-import { templateRegistry } from '@/lib/templates/index'
 import { setTemplateSelection, markDone, adminCancelRequest } from './actions'
 import * as s from '@/styles/dashboard/dashboard.css'
+import TemplatePreview from '@/components/TemplatePreview'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
   pending: { label: '대기중', className: s.badgePending },
@@ -44,9 +44,6 @@ export default async function AdminRequestDetailPage({ params }: Props) {
   )
 
   const contacts = (request.contacts as { type: string; value: string }[] | null) ?? []
-  const selectedTemplate = request.selectedTemplateId
-    ? templateRegistry[request.selectedTemplateId as keyof typeof templateRegistry]
-    : null
 
   const btnBase: React.CSSProperties = {
     padding: '10px 20px', border: '1px solid', cursor: 'pointer',
@@ -118,15 +115,23 @@ export default async function AdminRequestDetailPage({ params }: Props) {
         {request.additionalRequest && (
           <Row label="추가 요청사항" value={request.additionalRequest} />
         )}
-        {selectedTemplate && (
-          <Row label="선택한 템플릿" value={
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 600 }}>{selectedTemplate.label}</span>
-              <span style={{ color: 'rgba(12,12,12,0.45)', fontSize: '13px' }}>{selectedTemplate.description}</span>
-            </div>
-          } />
-        )}
       </div>
+
+      {/* 선택된 템플릿 프리뷰 */}
+      {request.selectedTemplateId && (
+        <div style={{ marginBottom: '24px' }}>
+          <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '16px', letterSpacing: '-0.02em', marginBottom: '16px', marginTop: 0 }}>
+            선택한 템플릿
+          </h2>
+          <TemplatePreview
+            templateId={request.selectedTemplateId}
+            brandName={request.brandName}
+            brandDescription={request.brandDescription}
+            brandColors={request.brandColors ?? []}
+            imageUrls={additionalSignedUrls.filter(Boolean) as string[]}
+          />
+        </div>
+      )}
 
       {/* 액션 패널 */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>

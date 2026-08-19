@@ -9,5 +9,3 @@ export type TemplateId =
   | 'template-a'
   | 'template-b'
   | 'template-c'
-  | 'template-d'
-  | 'template-e'

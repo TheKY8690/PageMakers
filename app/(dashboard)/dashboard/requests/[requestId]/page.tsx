@@ -8,6 +8,7 @@ import { and, eq } from 'drizzle-orm'
 import TemplatePicker from './preview/TemplatePicker'
 import { cancelRequest } from './actions'
 import * as s from '@/styles/dashboard/dashboard.css'
+import TemplatePreview from '@/components/TemplatePreview'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
   pending: { label: '대기중', className: s.badgePending },
@@ -193,8 +194,24 @@ export default async function RequestDetailPage({ params }: Props) {
         </div>
       )}
 
+      {/* 선택된 템플릿 프리뷰 */}
+      {request.selectedTemplateId && (
+        <div style={{ marginTop: '32px' }}>
+          <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '16px', letterSpacing: '-0.03em', marginBottom: '16px', color: '#0C0C0C' }}>
+            선택한 템플릿
+          </h2>
+          <TemplatePreview
+            templateId={request.selectedTemplateId}
+            brandName={request.brandName}
+            brandDescription={request.brandDescription}
+            brandColors={request.brandColors ?? []}
+            imageUrls={additionalSignedUrls.filter(Boolean) as string[]}
+          />
+        </div>
+      )}
+
       {/* 템플릿 선택 */}
-      {status === 'template_selection' && (
+      {status === 'template_selection' && !request.selectedTemplateId && (
         <div style={{ marginTop: '32px' }}>
           <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '18px', letterSpacing: '-0.03em', marginBottom: '8px', color: '#0C0C0C' }}>
             템플릿 선택
