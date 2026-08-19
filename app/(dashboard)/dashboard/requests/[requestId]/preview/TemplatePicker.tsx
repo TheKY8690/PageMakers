@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { templateRegistry, TEMPLATE_IDS } from '@/lib/templates/index'
-import { selectTemplate } from './actions'
+import { confirmTemplate } from '../actions'
 import type { TemplateId } from '@/lib/templates/types'
 import type { TemplateProps } from '@/lib/templates/types'
 
@@ -20,7 +20,7 @@ export default function TemplatePicker({ requestId, ...templateProps }: Props) {
 
   function handleConfirm() {
     if (!selected) return
-    startTransition(() => selectTemplate(requestId, selected))
+    startTransition(() => confirmTemplate(requestId, selected))
   }
 
   return (

@@ -268,6 +268,160 @@ export const errorText = style({
   lineHeight: 1.4,
 })
 
+export const imageRow = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: '12px',
+})
+
+export const contactChipGroup = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '8px',
+})
+
+export const contactChip = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '8px 14px',
+  border: `1.5px solid ${colors.border}`,
+  borderRadius: '2px',
+  fontSize: '14px',
+  color: colors.subText,
+  cursor: 'pointer',
+  userSelect: 'none',
+  background: 'transparent',
+  fontFamily: 'inherit',
+  transition: 'border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease',
+  selectors: {
+    '&:hover': {
+      borderColor: colors.primary,
+      color: colors.foreground,
+    },
+  },
+})
+
+export const contactChipSelected = style([
+  contactChip,
+  {
+    borderColor: colors.primary,
+    borderWidth: '2px',
+    color: colors.foreground,
+    backgroundColor: colors.muted,
+    fontWeight: 500,
+  },
+])
+
+export const contactInputList = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  marginTop: '8px',
+})
+
+export const contactInputRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+})
+
+export const contactTypeLabel = style({
+  fontSize: '13px',
+  color: colors.subText,
+  width: '90px',
+  flexShrink: 0,
+  fontWeight: 500,
+})
+
+export const contactRemoveBtn = style({
+  width: '28px',
+  height: '28px',
+  flexShrink: 0,
+  borderRadius: '2px',
+  border: 'none',
+  backgroundColor: 'transparent',
+  color: colors.subText,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  fontSize: '16px',
+  lineHeight: 1,
+  transition: 'background-color 0.15s ease, color 0.15s ease',
+  selectors: {
+    '&:hover': {
+      backgroundColor: colors.errorBg,
+      color: colors.error,
+    },
+  },
+})
+
+export const thumbnailGrid = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '8px',
+  marginTop: '8px',
+})
+
+export const thumbnailItem = style({
+  position: 'relative',
+  width: '80px',
+  height: '80px',
+})
+
+export const thumbnailImg = style({
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  borderRadius: '2px',
+  border: `1px solid ${colors.border}`,
+  display: 'block',
+})
+
+export const thumbnailAddBtn = style({
+  width: '80px',
+  height: '80px',
+  border: `1.5px dashed ${colors.border}`,
+  borderRadius: '2px',
+  backgroundColor: 'transparent',
+  color: colors.subText,
+  cursor: 'pointer',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '4px',
+  fontSize: '11px',
+  flexShrink: 0,
+  transition: 'border-color 0.15s ease, color 0.15s ease',
+  selectors: {
+    '&:hover': {
+      borderColor: colors.primary,
+      color: colors.primary,
+    },
+  },
+})
+
+export const thumbnailRemove = style({
+  position: 'absolute',
+  top: '-6px',
+  right: '-6px',
+  width: '18px',
+  height: '18px',
+  borderRadius: '50%',
+  border: 'none',
+  backgroundColor: colors.primary,
+  color: colors.white,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '12px',
+  lineHeight: 1,
+  padding: 0,
+})
+
 export const submitBtn = style({
   backgroundColor: colors.primary,
   color: colors.white,

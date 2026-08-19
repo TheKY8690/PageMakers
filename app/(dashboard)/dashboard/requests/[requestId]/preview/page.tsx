@@ -1,7 +1,7 @@
 import { db } from '@/lib/db'
 import { portfolioRequests } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import TemplatePicker from './TemplatePicker'
 
 interface Props {
@@ -17,6 +17,7 @@ export default async function PreviewPage({ params }: Props) {
     .where(eq(portfolioRequests.id, requestId))
 
   if (!request) notFound()
+  if (request.status !== 'template_selection') redirect(`/dashboard/requests/${requestId}`)
 
   return (
     <main style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '48px 24px' }}>
