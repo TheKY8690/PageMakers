@@ -1,6 +1,12 @@
 import { jsonb, pgPolicy, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
+export const profiles = pgTable('profiles', {
+  id: uuid('id').primaryKey(),
+  role: text('role').notNull().default('user'), // 'user' | 'admin'
+  createdAt: timestamp('created_at').defaultNow(),
+})
+
 export const portfolioRequests = pgTable(
   'portfolio_requests',
   {
