@@ -89,6 +89,24 @@ export const badgeDone = style([
   },
 ])
 
+export const badgeCancelled = style([
+  badge,
+  {
+    color: '#991B1B',
+    backgroundColor: 'rgba(254,226,226,0.6)',
+    borderColor: 'rgba(220,38,38,0.2)',
+  },
+])
+
+export const badgeTemplateSelection = style([
+  badge,
+  {
+    color: '#1E40AF',
+    backgroundColor: 'rgba(219,234,254,0.6)',
+    borderColor: 'rgba(59,130,246,0.2)',
+  },
+])
+
 export const emptyState = style({
   textAlign: 'center',
   padding: '80px 20px',
