@@ -58,5 +58,5 @@ export async function createPortfolioRequest(formData: FormData) {
     })
     .returning({ id: portfolioRequests.id })
 
-  redirect(`/dashboard/requests/${inserted.id}/preview`)
+  redirect('/dashboard')
 }

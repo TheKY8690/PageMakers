@@ -13,6 +13,7 @@ export const portfolioRequests = pgTable(
     mainImageUrl: text('main_image_url'),
     imageUrls: text('image_urls').array().default([]),
     contacts: jsonb('contacts').$type<{ type: string; value: string }[]>().default([]),
+    selectedTemplateId: text('selected_template_id'),
     additionalRequest: text('additional_request'),
     status: text('status').default('pending'), // pending | in_progress | done
     createdAt: timestamp('created_at').defaultNow(),

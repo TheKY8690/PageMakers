@@ -1,22 +1,33 @@
 import Link from 'next/link'
+import { db } from '@/lib/db'
+import { portfolioRequests } from '@/lib/db/schema'
+import { createClient } from '@/lib/supabase/server'
+import { eq, desc } from 'drizzle-orm'
 import * as s from '../../../styles/dashboard/dashboard.css'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
-  pending: { label: '검토 중', className: s.badgePending },
-  in_progress: { label: '제작 중', className: s.badgeInProgress },
-  done: { label: '완료', className: s.badgeDone },
-}
-
-type Request = {
-  id: string
-  brandName: string
-  status: string | null
-  createdAt: Date | null
+  pending: { label: '대기중', className: s.badgePending },
+  cancelled: { label: '취소', className: s.badgeCancelled },
+  template_selection: { label: '선택요망', className: s.badgeTemplateSelection },
+  done: { label: '제작완료', className: s.badgeDone },
 }
 
 export default async function DashboardPage() {
-  // TODO: DB 연결 후 실제 쿼리로 교체
-  const requests: Request[] = []
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const requests = await db
+    .select({
+      id: portfolioRequests.id,
+      brandName: portfolioRequests.brandName,
+      status: portfolioRequests.status,
+      createdAt: portfolioRequests.createdAt,
+    })
+    .from(portfolioRequests)
+    .where(eq(portfolioRequests.userId, user!.id))
+    .orderBy(desc(portfolioRequests.createdAt))
 
   return (
     <>
@@ -27,9 +38,7 @@ export default async function DashboardPage() {
       {requests.length === 0 ? (
         <div className={s.emptyState}>
           <p className={s.emptyStateTitle}>아직 요청이 없습니다</p>
-          <p className={s.emptyStateText}>
-            첫 번째 포트폴리오 페이지를 요청해보세요.
-          </p>
+          <p className={s.emptyStateText}>첫 번째 포트폴리오 페이지를 요청해보세요.</p>
           <Link href="/dashboard/portfolios/new" className={s.ctaLink}>
             첫 번째 요청하기
           </Link>
@@ -61,7 +70,7 @@ export default async function DashboardPage() {
                     <td className={s.td}>{date}</td>
                     <td className={s.td}>
                       <Link
-                        href={`/dashboard/portfolios/${req.id}`}
+                        href={`/dashboard/requests/${req.id}`}
                         className={s.detailLink}
                       >
                         상세보기
