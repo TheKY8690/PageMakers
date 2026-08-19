@@ -1,10 +1,13 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
-import { portfolioRequests } from '@/lib/db/schema'
+import { portfolioRequests, profiles } from '@/lib/db/schema'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { eq, desc } from 'drizzle-orm'
 import * as s from '@/styles/dashboard/dashboard.css'
+import { setUserRole } from './actions'
+import ClickableRow from '../ClickableRow'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
   pending: { label: '대기중', className: s.badgePending },
@@ -18,8 +21,15 @@ interface Props { params: Promise<{ id: string }> }
 export default async function AdminUserDetailPage({ params }: Props) {
   const { id } = await params
 
+  const supabase = await createClient()
+  const { data: { user: me } } = await supabase.auth.getUser()
+
   const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(id)
   if (error || !user) notFound()
+
+  const [profile] = await db.select().from(profiles).where(eq(profiles.id, id))
+  const currentRole = profile?.role ?? 'user'
+  const isSelf = me?.id === id
 
   const requests = await db
     .select({
@@ -33,6 +43,11 @@ export default async function AdminUserDetailPage({ params }: Props) {
     .where(eq(portfolioRequests.userId, id))
     .orderBy(desc(portfolioRequests.createdAt))
 
+  const btnBase: React.CSSProperties = {
+    padding: '8px 16px', border: '1px solid', cursor: 'pointer',
+    fontSize: '13px', fontWeight: 500, fontFamily: 'inherit', borderRadius: '2px',
+  }
+
   return (
     <div style={{ padding: '32px', maxWidth: '760px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
@@ -42,10 +57,11 @@ export default async function AdminUserDetailPage({ params }: Props) {
         <h1 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 800, fontSize: '20px', letterSpacing: '-0.03em', margin: 0 }}>
           {user.email ?? id}
         </h1>
+        {currentRole === 'admin' && <span className={s.badgeTemplateSelection}>admin</span>}
       </div>
 
       {/* 유저 정보 */}
-      <div style={{ border: '1px solid rgba(12,12,12,0.1)', backgroundColor: '#fff', marginBottom: '32px' }}>
+      <div style={{ border: '1px solid rgba(12,12,12,0.1)', backgroundColor: '#fff', marginBottom: '16px' }}>
         {[
           ['이메일', user.email ?? '-'],
           ['UID', user.id],
@@ -58,6 +74,24 @@ export default async function AdminUserDetailPage({ params }: Props) {
             <span style={{ color: '#0C0C0C', wordBreak: 'break-all' }}>{value}</span>
           </div>
         ))}
+      </div>
+
+      {/* Role 관리 */}
+      <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {currentRole === 'user' ? (
+          <form action={setUserRole.bind(null, id, 'admin')}>
+            <button type="submit" style={{ ...btnBase, background: '#0C0C0C', color: '#fff', borderColor: '#0C0C0C' }}>
+              Admin으로 승격
+            </button>
+          </form>
+        ) : (
+          <form action={setUserRole.bind(null, id, 'user')}>
+            <button type="submit" style={{ ...btnBase, background: 'transparent', color: '#DC2626', borderColor: 'rgba(220,38,38,0.4)' }} disabled={isSelf}>
+              Admin 해제
+            </button>
+          </form>
+        )}
+        {isSelf && <span style={{ fontSize: '12px', color: 'rgba(12,12,12,0.4)' }}>본인 계정은 해제 불가</span>}
       </div>
 
       {/* 요청 목록 */}
@@ -74,24 +108,18 @@ export default async function AdminUserDetailPage({ params }: Props) {
               <th className={s.th}>유형</th>
               <th className={s.th}>상태</th>
               <th className={s.th}>요청일</th>
-              <th className={s.th}></th>
             </tr>
           </thead>
           <tbody>
             {requests.map((req) => {
               const badge = badgeMap[req.status ?? 'pending'] ?? badgeMap.pending
               return (
-                <tr key={req.id} className={s.row}>
+                <ClickableRow key={req.id} href={`/admin/requests/${req.id}`}>
                   <td className={s.td} style={{ fontWeight: 500 }}>{req.brandName}</td>
                   <td className={s.td}>{req.websiteType}</td>
                   <td className={s.td}><span className={badge.className}>{badge.label}</span></td>
                   <td className={s.td}>{req.createdAt ? new Date(req.createdAt).toLocaleDateString('ko-KR') : '-'}</td>
-                  <td className={s.td}>
-                    <Link href={`/admin/requests/${req.id}`} className={s.detailLink}>
-                      상세보기
-                    </Link>
-                  </td>
-                </tr>
+                </ClickableRow>
               )
             })}
           </tbody>
