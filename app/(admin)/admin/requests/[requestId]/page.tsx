@@ -7,13 +7,16 @@ import { eq } from 'drizzle-orm'
 import { setTemplateSelection, markDone, resetTemplateChoice, adminCancelRequest } from './actions'
 import * as s from '@/styles/dashboard/dashboard.css'
 import AdminVariantPreviewer from '@/components/AdminVariantPreviewer'
+import AdminStatusChanger from './AdminStatusChanger'
 import { requestVariants } from '@/lib/templates/index'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
-  pending: { label: '대기중', className: s.badgePending },
-  cancelled: { label: '취소', className: s.badgeCancelled },
-  template_selection: { label: '선택요망', className: s.badgeTemplateSelection },
-  done: { label: '제작완료', className: s.badgeDone },
+  pending:            { label: '요청중',     className: s.badgePending },
+  waiting:            { label: '작업대기중', className: s.badgeWaiting },
+  in_progress:        { label: '작업중',     className: s.badgeInProgress },
+  template_selection: { label: '선택요망',   className: s.badgeTemplateSelection },
+  done:               { label: '제작완료',   className: s.badgeDone },
+  cancelled:          { label: '취소',       className: s.badgeCancelled },
 }
 
 const CONTACT_LABELS: Record<string, string> = {
@@ -54,14 +57,19 @@ export default async function AdminRequestDetailPage({ params }: Props) {
   return (
     <div style={{ padding: '32px', maxWidth: '760px' }}>
       {/* 헤더 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
-        <Link href="/admin/requests" style={{ color: 'rgba(12,12,12,0.45)', fontSize: '13px', textDecoration: 'none' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <Link href="/admin/requests" style={{ color: 'rgba(12,12,12,0.45)', fontSize: '13px', textDecoration: 'none', display: 'inline-block', marginBottom: '12px' }}>
           ← 목록
         </Link>
-        <h1 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 800, fontSize: '20px', letterSpacing: '-0.03em', margin: 0 }}>
-          {request.brandName}
-        </h1>
-        <span className={badge.className}>{badge.label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <h1 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 800, fontSize: '20px', letterSpacing: '-0.03em', margin: 0 }}>
+            {request.brandName}
+          </h1>
+          <span className={badge.className}>{badge.label}</span>
+          <div style={{ marginLeft: 'auto' }}>
+            <AdminStatusChanger requestId={requestId} currentStatus={status} />
+          </div>
+        </div>
       </div>
 
       {/* 상세 내용 */}

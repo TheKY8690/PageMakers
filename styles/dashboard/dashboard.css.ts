@@ -80,6 +80,15 @@ export const badgeInProgress = style([
   },
 ])
 
+export const badgeWaiting = style([
+  badge,
+  {
+    color: '#5B21B6',
+    backgroundColor: 'rgba(237,233,254,0.6)',
+    borderColor: 'rgba(139,92,246,0.2)',
+  },
+])
+
 export const badgeDone = style([
   badge,
   {

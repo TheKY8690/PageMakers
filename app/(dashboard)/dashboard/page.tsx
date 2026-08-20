@@ -6,10 +6,12 @@ import { eq, desc } from 'drizzle-orm'
 import * as s from '../../../styles/dashboard/dashboard.css'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
-  pending: { label: '대기중', className: s.badgePending },
-  cancelled: { label: '취소', className: s.badgeCancelled },
-  template_selection: { label: '선택요망', className: s.badgeTemplateSelection },
-  done: { label: '제작완료', className: s.badgeDone },
+  pending:            { label: '요청중',     className: s.badgePending },
+  waiting:            { label: '작업대기중', className: s.badgeWaiting },
+  in_progress:        { label: '작업중',     className: s.badgeInProgress },
+  template_selection: { label: '선택요망',   className: s.badgeTemplateSelection },
+  done:               { label: '제작완료',   className: s.badgeDone },
+  cancelled:          { label: '취소',       className: s.badgeCancelled },
 }
 
 export default async function DashboardPage() {
