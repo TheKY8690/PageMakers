@@ -48,6 +48,16 @@ export async function markDone(requestId: string, formData: FormData) {
   redirect(`/admin/requests/${requestId}`)
 }
 
+export async function resetTemplateChoice(requestId: string) {
+  await db
+    .update(portfolioRequests)
+    .set({ selectedTemplateId: null })
+    .where(eq(portfolioRequests.id, requestId))
+
+  revalidatePath(`/admin/requests/${requestId}`)
+  revalidatePath('/admin/requests')
+}
+
 export async function adminCancelRequest(requestId: string) {
   await db
     .update(portfolioRequests)

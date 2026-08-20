@@ -4,9 +4,10 @@ import { db } from '@/lib/db'
 import { portfolioRequests } from '@/lib/db/schema'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { eq } from 'drizzle-orm'
-import { setTemplateSelection, markDone, adminCancelRequest } from './actions'
+import { setTemplateSelection, markDone, resetTemplateChoice, adminCancelRequest } from './actions'
 import * as s from '@/styles/dashboard/dashboard.css'
-import TemplatePreview from '@/components/TemplatePreview'
+import AdminVariantPreviewer from '@/components/AdminVariantPreviewer'
+import { requestVariants } from '@/lib/templates/index'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
   pending: { label: '대기중', className: s.badgePending },
@@ -117,18 +118,34 @@ export default async function AdminRequestDetailPage({ params }: Props) {
         )}
       </div>
 
-      {/* 선택된 템플릿 프리뷰 */}
-      {request.selectedTemplateId && (
-        <div style={{ marginBottom: '24px' }}>
-          <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '16px', letterSpacing: '-0.02em', marginBottom: '16px', marginTop: 0 }}>
-            선택한 템플릿
-          </h2>
-          <TemplatePreview
-            templateId={request.selectedTemplateId}
+      {/* 제작된 시안 — requestVariants에 있으면 전체 표시 */}
+      {requestVariants[requestId] && (
+        <div style={{ marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '16px', letterSpacing: '-0.02em', margin: 0 }}>
+              제작된 시안
+            </h2>
+            {request.selectedTemplateId && status === 'template_selection' && (
+              <form action={async () => { 'use server'; await resetTemplateChoice(requestId) }}>
+                <button
+                  type="submit"
+                  style={{ ...btnBase, fontSize: '12px', padding: '6px 14px', color: 'rgba(12,12,12,0.55)', borderColor: 'rgba(12,12,12,0.2)', background: 'transparent' }}
+                >
+                  선택 초기화
+                </button>
+              </form>
+            )}
+          </div>
+          <AdminVariantPreviewer
+            requestId={requestId}
+            selectedTemplateId={request.selectedTemplateId}
             brandName={request.brandName}
             brandDescription={request.brandDescription}
             brandColors={request.brandColors ?? []}
             imageUrls={additionalSignedUrls.filter(Boolean) as string[]}
+            mainImageUrl={mainSignedUrl}
+            contacts={contacts}
+            websiteType={request.websiteType ?? undefined}
           />
         </div>
       )}
