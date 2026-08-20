@@ -24,17 +24,21 @@ const CSS = `
   .v3-hero-tagline { animation: v3FadeUp 0.7s ease 0.5s both; }
 
   .v3-reveal {
-    opacity: 0; transform: translateY(24px);
-    transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    opacity: 0;
+    transform: translateY(28px) scale(1.03);
+    filter: blur(5px);
+    transition: opacity 1s cubic-bezier(0.16,1,0.3,1),
+                transform 1s cubic-bezier(0.16,1,0.3,1),
+                filter 1s cubic-bezier(0.16,1,0.3,1);
   }
-  .v3-reveal.visible { opacity: 1; transform: translateY(0); }
+  .v3-reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 
   .v3-img-wrap { overflow: hidden; position: relative; }
   .v3-img-wrap img {
     display: block; width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    transition: transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s ease;
   }
-  .v3-img-wrap:hover img { transform: scale(1.04); }
+  .v3-img-wrap:hover img { transform: scale(1.06) translateY(-4px); }
   .v3-img-tint {
     position: absolute; inset: 0;
     background: rgba(148,0,0,0.25);
@@ -62,6 +66,11 @@ const CSS = `
     .v3-img-wrap img { transition: none !important; }
     .v3-img-tint { transition: none !important; }
   }
+  .v3-masonry { columns: 2; column-gap: 4px; }
+  .v3-masonry-3 { columns: 3; column-gap: 4px; }
+  .v3-masonry-item { break-inside: avoid; margin-bottom: 4px; }
+  .v3-masonry img, .v3-natural img { height: auto !important; object-fit: initial !important; }
+
   @media (max-width: 768px) {
     .v3-hero { flex-direction: column !important; min-height: auto !important; }
     .v3-hero-left { width: 100% !important; min-height: 60vw; padding: 40px 20px !important; }
@@ -74,6 +83,9 @@ const CSS = `
     .v3-contact-wrap { padding: 60px 20px !important; }
     .v3-contact-grid { grid-template-columns: 1fr !important; }
     .v3-footer { padding: 24px 20px !important; }
+    .v3-mid-editorial { grid-template-columns: 1fr !important; padding: 48px 20px !important; }
+    .v3-masonry { columns: 1 !important; }
+    .v3-masonry-3 { columns: 1 !important; }
   }
 `
 
@@ -176,27 +188,54 @@ export default function Variant3({
             </span>
           </div>
 
-          {/* Middle: brand name */}
+          {/* Middle: wordmark + tagline (두 파트로 분리) */}
           <div>
+            <p
+              className="v3-hero-eyebrow"
+              style={{
+                fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.6)', fontWeight: 600, margin: '0 0 24px',
+              }}
+            >
+              {brandName}
+            </p>
             <h1 style={{ margin: 0 }}>
-              {brandName.split('').map((ch, i) => (
-                <span key={i} className="v3-hero-name-line" style={{ display: 'block', lineHeight: 0.88 }}>
+              {/* 첫 단어 — 크게 */}
+              <span className="v3-hero-name-line" style={{ display: 'block' }}>
+                <span
+                  className="v3-hero-name"
+                  style={{
+                    display: 'block',
+                    fontSize: 'clamp(48px, 7.5vw, 96px)',
+                    fontWeight: 900,
+                    letterSpacing: '-0.05em',
+                    lineHeight: 0.95,
+                    color: '#FFFFFF',
+                    animationDelay: '0.1s',
+                  }}
+                >
+                  {tagline.split(' ')[0]}
+                </span>
+              </span>
+              {/* 나머지 단어 — 작게 + accent 컬러 */}
+              {tagline.split(' ').length > 1 && (
+                <span className="v3-hero-name-line" style={{ display: 'block', marginTop: '8px' }}>
                   <span
                     className="v3-hero-name"
                     style={{
                       display: 'block',
-                      fontSize: 'clamp(56px, 8.5vw, 128px)',
-                      fontWeight: 900,
-                      letterSpacing: '-0.045em',
-                      color: '#FFFFFF',
-                      textTransform: 'uppercase',
-                      animationDelay: `${0.1 + i * 0.05}s`,
+                      fontSize: 'clamp(20px, 3vw, 36px)',
+                      fontWeight: 600,
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.3,
+                      color: 'rgba(255,255,255,0.75)',
+                      animationDelay: '0.2s',
                     }}
                   >
-                    {ch}
+                    {tagline.split(' ').slice(1).join(' ')}
                   </span>
                 </span>
-              ))}
+              )}
             </h1>
           </div>
 
@@ -294,51 +333,88 @@ export default function Variant3({
         )}
       </section>
 
-      {/* ── Gallery ── */}
+      {/* ── 사진 페어 — 1fr 2fr (작은 왼쪽, 큰 오른쪽) ── */}
       {imageUrls.length > 0 && (
-        <section
-          className="v3-gallery-wrap"
-          style={{ padding: '64px 52px', background: '#111' }}
-        >
-          <p
-            style={{
-              fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'rgba(245,245,245,0.22)', marginBottom: '20px',
-            }}
-          >
-            Works
-          </p>
-          <div
-            className="v3-gallery-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gridAutoRows: '280px',
-              gap: '4px',
-            }}
-          >
-            {imageUrls.map((url, i) => {
-              const isWide = i === 0 || i === 6
-              return (
-                <div
-                  key={i}
-                  className="v3-reveal v3-img-wrap"
-                  style={{
-                    gridColumn: isWide ? 'span 2' : 'span 1',
-                    height: '280px',
-                    transitionDelay: `${(i % 3) * 0.07}s`,
-                  }}
-                >
-                  <img src={url} alt={`${brandName} 작품 ${i + 1}`} />
-                  <div className="v3-img-tint" />
-                </div>
-              )
-            })}
+        <section style={{ background: '#111', padding: '0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4px', alignItems: 'start' }}>
+            {imageUrls.slice(0, 2).map((url, i) => (
+              <div key={i} className="v3-reveal v3-img-wrap v3-natural" style={{ transitionDelay: `${i * 0.1}s` }}>
+                <img src={url} alt={`${brandName} 작품 ${i + 1}`} />
+                <div className="v3-img-tint" />
+              </div>
+            ))}
           </div>
         </section>
       )}
 
-      {/* ── Big text accent ── */}
+      {/* ── 크림슨 Editorial ── */}
+      <section
+        className="v3-reveal v3-mid-editorial"
+        style={{
+          background: accent,
+          padding: '60px 52px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '48px',
+          alignItems: 'center',
+        }}
+      >
+        <div>
+          <p style={{ fontSize: '9px', letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: '20px' }}>
+            Process
+          </p>
+          <p style={{ fontSize: 'clamp(24px, 3.2vw, 42px)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.2, color: '#FFFFFF', margin: '0 0 20px' }}>
+            한 장의 사진 안에<br />수백 개의<br />결정이 있습니다
+          </p>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.85, margin: 0 }}>
+            셔터를 누르기까지의 모든 순간 —<br />
+            구도, 빛, 감정, 그리고 기다림.
+          </p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          {brandColors.map((c, i) => (
+            <div key={i} style={{ height: '48px', background: c, opacity: 0.35 + i * 0.25 }} />
+          ))}
+        </div>
+      </section>
+
+      {/* ── 피처드 사진 1장 ── */}
+      {imageUrls[2] && (
+        <section className="v3-reveal" style={{ background: '#111', padding: '0 52px' }}>
+          <div className="v3-img-wrap v3-natural" style={{ maxWidth: '50%', margin: '0 auto' }}>
+            <img
+              src={imageUrls[2]}
+              alt={`${brandName} 작품 3`}
+              style={{ objectPosition: 'center top' }}
+            />
+            <div className="v3-img-tint" />
+          </div>
+        </section>
+      )}
+
+      {/* ── 사진 하단 — 큰 왼쪽 + 오른쪽 세로 스택 ── */}
+      {imageUrls.length > 3 && (
+        <section style={{ background: '#111', padding: '4px 0 64px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '4px', alignItems: 'start' }}>
+            {/* 왼쪽: imageUrls[3] 크게 */}
+            <div className="v3-reveal v3-img-wrap v3-natural">
+              <img src={imageUrls[3]} alt={`${brandName} 작품 4`} />
+              <div className="v3-img-tint" />
+            </div>
+            {/* 오른쪽: imageUrls[4], [5] 세로 스택 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {imageUrls.slice(4, 6).map((url, i) => (
+                <div key={i} className="v3-reveal v3-img-wrap v3-natural" style={{ transitionDelay: `${(i + 1) * 0.08}s` }}>
+                  <img src={url} alt={`${brandName} 작품 ${i + 5}`} />
+                  <div className="v3-img-tint" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Statement accent ── */}
       <section
         className="v3-big-text v3-reveal"
         style={{
@@ -349,21 +425,20 @@ export default function Variant3({
       >
         <p
           style={{
-            fontSize: 'clamp(36px, 6vw, 88px)',
+            fontSize: 'clamp(28px, 4.5vw, 72px)',
             fontWeight: 900,
             letterSpacing: '-0.04em',
-            lineHeight: 1.05,
-            color: 'rgba(255,255,255,0.18)',
-            textTransform: 'uppercase',
+            lineHeight: 1.15,
+            color: 'rgba(255,255,255,0.22)',
             margin: 0,
             userSelect: 'none',
           }}
         >
-          {brandName}
+          카메라 뒤에서
           <br />
-          {brandName}
+          나는 세상을
           <br />
-          {brandName}
+          다시 배운다
         </p>
       </section>
 

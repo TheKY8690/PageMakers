@@ -23,17 +23,22 @@ const CSS = `
   .v2-hero-img-wrap { animation: v2FadeSlide 1s ease 0.5s both; }
 
   .v2-reveal {
-    opacity: 0; transform: translateY(20px);
-    transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    opacity: 0;
+    transform: translateY(24px) scale(1.02);
+    filter: blur(4px);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                transform 0.9s cubic-bezier(0.16,1,0.3,1),
+                filter 0.9s cubic-bezier(0.16,1,0.3,1);
   }
-  .v2-reveal.visible { opacity: 1; transform: translateY(0); }
+  .v2-reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 
   .v2-img-cell { overflow: hidden; position: relative; }
   .v2-img-cell img {
     display: block; width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    transition: transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s ease;
+    filter: saturate(0.85);
   }
-  .v2-img-cell:hover img { transform: scale(1.03); }
+  .v2-img-cell:hover img { transform: scale(1.06) translateY(-3px); filter: saturate(1); }
 
   .v2-contact-card {
     border: 1px solid rgba(12,12,12,0.1);
@@ -53,6 +58,11 @@ const CSS = `
     }
     .v2-img-cell img { transition: none !important; }
   }
+  .v2-masonry { columns: 2; column-gap: 12px; }
+  .v2-masonry-3 { columns: 3; column-gap: 12px; }
+  .v2-masonry-item { break-inside: avoid; margin-bottom: 12px; }
+  .v2-masonry img, .v2-natural img { height: auto !important; object-fit: initial !important; }
+
   @media (max-width: 768px) {
     .v2-nav { padding: 16px 20px !important; }
     .v2-hero { padding: 32px 20px 40px !important; }
@@ -66,6 +76,8 @@ const CSS = `
     .v2-contact-wrap { padding: 60px 20px !important; }
     .v2-contact-grid { grid-template-columns: 1fr !important; }
     .v2-footer { padding: 24px 20px !important; }
+    .v2-masonry { columns: 1 !important; }
+    .v2-masonry-3 { columns: 1 !important; }
   }
 `
 
@@ -105,12 +117,6 @@ export default function Variant2({
     targets.forEach((t) => io.observe(t))
     return () => io.disconnect()
   }, [])
-
-  // 이름 길면 두 줄로 분리
-  const nameParts =
-    brandName.length > 8 && brandName.includes(' ')
-      ? [brandName.slice(0, brandName.lastIndexOf(' ')), brandName.slice(brandName.lastIndexOf(' ') + 1)]
-      : [brandName]
 
   return (
     <div
@@ -165,55 +171,80 @@ export default function Variant2({
         className="v2-hero"
         style={{ padding: '48px 48px 0' }}
       >
-        {/* Sub caption */}
-        <p
-          className="v2-hero-sub"
-          style={{
-            fontSize: '10px', letterSpacing: '0.28em', textTransform: 'uppercase',
-            color: 'rgba(12,12,12,0.4)', marginBottom: '16px', fontWeight: 400,
-          }}
-        >
-          {tagline}
-        </p>
-
-        {/* Brand name */}
-        <h1 style={{ margin: '0 0 40px' }}>
-          {nameParts.map((part, pi) => (
-            <span key={pi} className="v2-hero-name-line" style={{ display: 'block' }}>
+        {/* Tagline — editorial headline */}
+        <h1 style={{ margin: '0 0 20px', padding: 0 }}>
+          {tagline.split(' ').map((word, wi) => (
+            <span key={wi} className="v2-hero-name-line" style={{ display: 'block' }}>
               <span
-                className="v2-hero-name v2-hero-name-inner"
+                className="v2-hero-name-inner"
                 style={{
-                  fontSize: 'clamp(64px, 11vw, 148px)',
-                  fontWeight: 900,
-                  letterSpacing: '-0.045em',
-                  lineHeight: 0.9,
+                  display: 'block',
+                  fontSize: 'clamp(44px, 7vw, 88px)',
+                  fontWeight: 700,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.05,
                   color: '#0C0C0C',
-                  textTransform: 'uppercase',
-                  animationDelay: `${0.3 + pi * 0.12}s`,
+                  animationDelay: `${0.3 + wi * 0.1}s`,
                 }}
               >
-                {part}
+                {word}
               </span>
             </span>
           ))}
         </h1>
 
-        {/* Hero image */}
+        {/* Brand name — small caption */}
+        <p
+          className="v2-hero-sub"
+          style={{
+            fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase',
+            color: accent, marginBottom: '0', fontWeight: 600,
+          }}
+        >
+          {brandName}
+        </p>
+
+        {/* Hero image — natural ratio + text overlay */}
         {mainImageUrl && (
           <div
             className="v2-hero-img-wrap"
             style={{
+              position: 'relative',
               width: '100%',
-              aspectRatio: '16 / 6',
               overflow: 'hidden',
-              marginTop: '8px',
+              marginTop: '32px',
             }}
           >
             <img
               src={mainImageUrl}
               alt={`${brandName} 대표 이미지`}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
             />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)',
+                display: 'flex',
+                alignItems: 'flex-end',
+                padding: '48px',
+              }}
+            >
+              <div>
+                <p style={{
+                  fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.55)', margin: '0 0 12px', fontWeight: 600,
+                }}>
+                  Selected Works
+                </p>
+                <p style={{
+                  fontSize: 'clamp(20px, 2.8vw, 36px)', fontWeight: 700, letterSpacing: '-0.03em',
+                  color: '#FFFFFF', margin: 0, lineHeight: 1.3,
+                }}>
+                  시선이 머무는 곳,<br />그곳이 작품이 됩니다
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </section>
@@ -285,43 +316,70 @@ export default function Variant2({
         </div>
       </section>
 
-      {/* ── Gallery ── */}
-      {imageUrls.length > 1 && (
-        <section
-          className="v2-gallery-wrap"
-          style={{ padding: '0 48px 80px' }}
-        >
-          <p
-            style={{
-              fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'rgba(12,12,12,0.3)', marginBottom: '20px',
-            }}
-          >
-            Works
-          </p>
-          <div
-            className="v2-gallery-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '14px',
-            }}
-          >
-            {imageUrls.slice(1).map((url, i) => (
-              <div
-                key={i}
-                className="v2-reveal v2-img-cell"
-                style={{
-                  height: i % 3 === 1 ? '420px' : '320px',
-                  transitionDelay: `${(i % 2) * 0.08}s`,
-                }}
-              >
-                <img src={url} alt={`${brandName} 작품 ${i + 2}`} />
+      {/* ── 피처드 사진 ── */}
+      {imageUrls[1] && (
+        <section className="v2-reveal" style={{ padding: '0 48px', marginTop: '40px' }}>
+          <div className="v2-img-cell v2-natural" style={{ maxWidth: '50%', margin: '0 auto' }}>
+            <img
+              src={imageUrls[1]}
+              alt={`${brandName} 작품 2`}
+              style={{ objectPosition: 'center top' }}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 사진 2장 ── */}
+      {imageUrls.length > 2 && (
+        <section style={{ padding: '24px 48px 0' }}>
+          <div className="v2-masonry">
+            {imageUrls.slice(2, 4).map((url, i) => (
+              <div key={i} className="v2-reveal v2-img-cell v2-masonry-item" style={{ transitionDelay: `${i * 0.1}s` }}>
+                <img src={url} alt={`${brandName} 작품 ${i + 3}`} />
               </div>
             ))}
           </div>
         </section>
       )}
+
+      {/* ── 사진 3장 ── */}
+      {imageUrls.length > 4 && (
+        <section style={{ padding: '12px 48px 60px' }}>
+          <div className="v2-masonry-3">
+            {imageUrls.slice(4, 7).map((url, i) => (
+              <div key={i} className="v2-reveal v2-img-cell v2-masonry-item" style={{ transitionDelay: `${i * 0.08}s` }}>
+                <img src={url} alt={`${brandName} 작품 ${i + 5}`} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Closing quote ── */}
+      <section
+        className="v2-reveal"
+        style={{
+          padding: '60px 48px',
+          borderTop: '1px solid rgba(12,12,12,0.06)',
+          borderBottom: '1px solid rgba(12,12,12,0.06)',
+          background: '#FAFAFA',
+        }}
+      >
+        <p
+          style={{
+            fontSize: 'clamp(18px, 2.4vw, 30px)',
+            fontWeight: 600,
+            letterSpacing: '-0.025em',
+            color: '#0C0C0C',
+            lineHeight: 1.45,
+            margin: 0,
+            borderLeft: `3px solid ${accent}`,
+            paddingLeft: '22px',
+          }}
+        >
+          한 장의 사진 안에<br />수백 개의 결정이 있습니다
+        </p>
+      </section>
 
       {/* ── Accent line ── */}
       <section

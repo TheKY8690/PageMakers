@@ -24,18 +24,21 @@ const CSS = `
   .v1-hero-meta { animation: v1FadeIn 0.8s ease 0.8s both; }
   .v1-reveal {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    transform: translateY(32px) scale(1.03);
+    filter: blur(5px);
+    transition: opacity 1s cubic-bezier(0.16,1,0.3,1),
+                transform 1s cubic-bezier(0.16,1,0.3,1),
+                filter 1s cubic-bezier(0.16,1,0.3,1);
   }
-  .v1-reveal.visible { opacity: 1; transform: translateY(0); }
+  .v1-reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 
   .v1-img-wrap { overflow: hidden; position: relative; }
   .v1-img-wrap img {
     display: block; width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    transition: transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s ease;
     filter: saturate(0.7);
   }
-  .v1-img-wrap:hover img { transform: scale(1.04); filter: saturate(1); }
+  .v1-img-wrap:hover img { transform: scale(1.06) translateY(-4px); filter: saturate(1); }
   .v1-img-num {
     position: absolute; top: 14px; left: 14px;
     font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
@@ -69,6 +72,11 @@ const CSS = `
     .v1-ticker { animation: none !important; }
     .v1-img-wrap img { transition: none !important; }
   }
+  .v1-masonry { columns: 2; column-gap: 3px; }
+  .v1-masonry-3 { columns: 3; column-gap: 3px; }
+  .v1-masonry-item { break-inside: avoid; margin-bottom: 3px; }
+  .v1-masonry img, .v1-natural img { height: auto !important; object-fit: initial !important; }
+
   @media (max-width: 768px) {
     .v1-nav { padding: 16px 20px !important; }
     .v1-hero-inner { padding: 0 20px 48px !important; }
@@ -81,6 +89,8 @@ const CSS = `
     .v1-accent { padding: 28px 20px !important; overflow: hidden; }
     .v1-contact-section { padding: 60px 20px !important; }
     .v1-footer { padding: 24px 20px !important; }
+    .v1-masonry { columns: 1 !important; }
+    .v1-masonry-3 { columns: 1 !important; }
   }
 `
 
@@ -101,6 +111,7 @@ export default function Variant1({
 }: TemplateProps) {
   const [preloaderDone, setPreloaderDone] = useState(false)
   const pageRef = useRef<HTMLDivElement>(null)
+  const heroImgRef = useRef<HTMLImageElement>(null)
   const accent = brandColors[0] ?? '#940000'
 
   // brandDescription 파싱
@@ -120,6 +131,29 @@ export default function Variant1({
     )
     targets.forEach((t) => io.observe(t))
     return () => io.disconnect()
+  }, [])
+
+  // 히어로 이미지 패럴랙스
+  useEffect(() => {
+    const img = heroImgRef.current
+    if (!img) return
+    // 가장 가까운 스크롤 컨테이너 탐지 (admin overlay vs window)
+    let node: HTMLElement | null = img.parentElement
+    let scroller: HTMLElement | Window = window
+    while (node) {
+      const { overflow, overflowY } = getComputedStyle(node)
+      if (overflow === 'auto' || overflow === 'scroll' || overflowY === 'auto' || overflowY === 'scroll') {
+        scroller = node
+        break
+      }
+      node = node.parentElement
+    }
+    const onScroll = () => {
+      const scrolled = scroller instanceof Window ? window.scrollY : (scroller as HTMLElement).scrollTop
+      img.style.transform = `translateY(${scrolled * 0.22}px) scale(1.01)`
+    }
+    scroller.addEventListener('scroll', onScroll, { passive: true })
+    return () => scroller.removeEventListener('scroll', onScroll)
   }, [])
 
   const instagramContact = contacts.find((c) => c.type === 'instagram')
@@ -191,14 +225,16 @@ export default function Variant1({
         {mainImageUrl && (
           <>
             <img
+              ref={heroImgRef}
               src={mainImageUrl}
               alt={`${brandName} 대표 이미지`}
               style={{
                 position: 'absolute', inset: 0,
-                width: '100%', height: '100%',
+                width: '100%', height: '115%',
                 objectFit: 'cover', objectPosition: 'center top',
                 opacity: 0.32,
                 filter: 'saturate(0.4)',
+                willChange: 'transform',
               }}
             />
             <div
@@ -223,39 +259,38 @@ export default function Variant1({
           className="v1-hero-inner"
           style={{ position: 'relative', padding: '0 48px 64px' }}
         >
-          {/* Meta line */}
-          <p
+          {/* Tagline — editorial headline */}
+          <h1
             className="v1-hero-meta"
             style={{
-              fontSize: '10px', letterSpacing: '0.32em', textTransform: 'uppercase',
-              color: accent, marginBottom: '18px', fontWeight: 600,
+              fontSize: 'clamp(36px, 5.5vw, 72px)',
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+              color: '#F5F5F5',
+              margin: '0 0 20px',
+              padding: 0,
             }}
           >
-            — {tagline} —
-          </p>
-
-          {/* Brand name */}
-          <h1 style={{ margin: 0, padding: 0 }}>
-            <span className="v1-hero-line">
-              <span
-                className="v1-hero-name"
-                style={{
-                  fontSize: 'clamp(72px, 12vw, 160px)',
-                  fontWeight: 900,
-                  letterSpacing: '-0.045em',
-                  lineHeight: 0.9,
-                  color: '#F5F5F5',
-                  textTransform: 'uppercase',
-                  animationDelay: '0.1s',
-                }}
-              >
-                {brandName}
-              </span>
-            </span>
+            {tagline}
           </h1>
 
+          {/* Brand name — small caption */}
+          <p
+            style={{
+              fontSize: '11px',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: accent,
+              margin: '0 0 24px',
+              fontWeight: 600,
+            }}
+          >
+            {brandName}
+          </p>
+
           {/* Color strip */}
-          <div style={{ display: 'flex', gap: '3px', marginTop: '28px' }}>
+          <div style={{ display: 'flex', gap: '3px' }}>
             {brandColors.map((c, i) => (
               <div key={i} style={{ height: '2px', width: '40px', background: c }} />
             ))}
@@ -321,49 +356,71 @@ export default function Variant1({
         </div>
       </section>
 
-      {/* ── Gallery ── */}
+      {/* ── 사진 페어 — 2fr 1fr 비대칭 ── */}
       {imageUrls.length > 0 && (
-        <section
-          className="v1-gallery"
-          style={{ background: '#0C0C0C', padding: '80px 48px' }}
-        >
-          <p
-            style={{
-              fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'rgba(245,245,245,0.22)', marginBottom: '24px',
-            }}
-          >
-            Works
-          </p>
-          <div
-            className="v1-gallery-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gridAutoRows: '300px',
-              gap: '3px',
-            }}
-          >
-            {imageUrls.map((url, i) => {
-              const isWide = i === 0 || i === 5 || i === 9
-              return (
-                <div
-                  key={i}
-                  className="v1-reveal v1-img-wrap"
-                  style={{
-                    gridColumn: isWide ? 'span 2' : 'span 1',
-                    height: '300px',
-                    transitionDelay: `${(i % 3) * 0.06}s`,
-                  }}
-                >
-                  <img src={url} alt={`${brandName} 작품 ${i + 1}`} />
-                  <span className="v1-img-num">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
-              )
-            })}
+        <section style={{ background: '#0C0C0C', padding: '0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '3px', alignItems: 'start' }}>
+            {imageUrls.slice(0, 2).map((url, i) => (
+              <div key={i} className="v1-reveal v1-img-wrap v1-natural" style={{ transitionDelay: `${i * 0.1}s` }}>
+                <img src={url} alt={`${brandName} 작품 ${i + 1}`} />
+                <span className="v1-img-num">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+            ))}
           </div>
+        </section>
+      )}
+
+      {/* ── Philosophy quote ── */}
+      <section className="v1-reveal" style={{ background: '#F0EFE9', color: '#0C0C0C', padding: '80px 48px' }}>
+        <div style={{ maxWidth: '680px' }}>
+          <p style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(12,12,12,0.3)', marginBottom: '28px' }}>
+            Philosophy
+          </p>
+          <blockquote style={{ margin: '0 0 24px', borderLeft: `3px solid ${accent}`, paddingLeft: '22px' }}>
+            <p style={{ fontSize: 'clamp(22px, 2.8vw, 38px)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.3, color: '#0C0C0C', margin: 0 }}>
+              좋은 사진은<br />기억보다<br />정직합니다
+            </p>
+          </blockquote>
+          <p style={{ fontSize: '15px', color: 'rgba(12,12,12,0.55)', lineHeight: 1.85, letterSpacing: '-0.003em', margin: 0, paddingLeft: '25px' }}>
+            익숙한 것들 사이에서 낯선 아름다움을 발견하는 일.<br />
+            카메라는 그 시선을 붙잡는 도구입니다.
+          </p>
+        </div>
+      </section>
+
+      {/* ── 피처드 사진 1장 ── */}
+      {imageUrls[2] && (
+        <section className="v1-reveal" style={{ background: '#0C0C0C', padding: '0 48px' }}>
+          <div className="v1-img-wrap v1-natural" style={{ maxWidth: '50%', margin: '0 auto' }}>
+            <img
+              src={imageUrls[2]}
+              alt={`${brandName} 작품 3`}
+              style={{ objectPosition: 'center top' }}
+            />
+            <span className="v1-img-num">03</span>
+          </div>
+        </section>
+      )}
+
+      {/* ── 사진 하단 — 풀로우 + 2열 ── */}
+      {imageUrls.length > 3 && (
+        <section style={{ background: '#0C0C0C', padding: '3px 48px 80px' }}>
+          {/* imageUrls[3]: 풀 너비 */}
+          <div className="v1-reveal v1-img-wrap v1-natural" style={{ marginBottom: '3px' }}>
+            <img src={imageUrls[3]} alt={`${brandName} 작품 4`} />
+            <span className="v1-img-num">04</span>
+          </div>
+          {/* imageUrls[4,5]: 2열 */}
+          {imageUrls.length > 4 && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px', alignItems: 'start' }}>
+              {imageUrls.slice(4, 6).map((url, i) => (
+                <div key={i} className="v1-reveal v1-img-wrap v1-natural" style={{ transitionDelay: `${(i + 1) * 0.08}s` }}>
+                  <img src={url} alt={`${brandName} 작품 ${i + 5}`} />
+                  <span className="v1-img-num">{String(i + 5).padStart(2, '0')}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -377,20 +434,20 @@ export default function Variant1({
         }}
       >
         <div className="v1-ticker">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {Array.from({ length: 8 }).map((_, i) => (
             <span
               key={i}
               style={{
-                fontSize: 'clamp(16px, 2.4vw, 28px)',
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
-                color: 'rgba(255,255,255,0.2)',
+                fontSize: 'clamp(11px, 1.5vw, 16px)',
+                fontWeight: 500,
+                letterSpacing: '0.12em',
+                color: 'rgba(255,255,255,0.35)',
                 textTransform: 'uppercase',
                 flexShrink: 0,
               }}
             >
-              {brandName}
-              <span style={{ margin: '0 24px', color: 'rgba(255,255,255,0.1)' }}>×</span>
+              {tagline}
+              <span style={{ margin: '0 28px', color: 'rgba(255,255,255,0.12)' }}>—</span>
             </span>
           ))}
         </div>

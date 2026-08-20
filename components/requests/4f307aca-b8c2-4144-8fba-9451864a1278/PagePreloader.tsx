@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-// module-level — SPA 재방문 시 재생 방지
+// module-level — SPA 재방문 시 재생 방지 (hard reload에서 리셋됨)
 const shownSet = new Set<string>()
 
 interface PagePreloaderProps {
@@ -38,7 +38,7 @@ export default function PagePreloader({
     : 'rgba(255,255,255,0.75)'
 
   useEffect(() => {
-    // SPA 재방문 시 즉시 완료
+    // SPA 재방문 시 즉시 완료 (shownSet은 애니메이션 완료 후 추가되므로 StrictMode에 안전)
     if (shownSet.has(variantId)) {
       onDone()
       return
@@ -50,38 +50,40 @@ export default function PagePreloader({
       return
     }
 
-    shownSet.add(variantId)
     const overlay = overlayRef.current!
     const tl = gsap.timeline()
 
-    // Phase 1 — descriptor 등장
-    tl.to('[data-pp-caption]', {
-      opacity: 1,
-      y: 0,
-      duration: 0.65,
-      ease: 'power3.out',
-    })
+    // gsap.context로 셀렉터를 이 overlay 내부로 스코프 제한
+    // (AdminVariantPreviewer에서 3개 variant 동시 렌더링 시 충돌 방지)
+    const ctx = gsap.context(() => {
+      // Phase 1 — descriptor 등장
+      tl.to('[data-pp-caption]', {
+        opacity: 1,
+        y: 0,
+        duration: 0.65,
+        ease: 'power3.out',
+      })
 
-    // Phase 1b — brandName 글자 stagger
-    tl.to('[data-pp-name]', {
-      opacity: 1,
-      y: 0,
-      duration: 0.75,
-      ease: 'power4.out',
-      stagger: 0.04,
-    }, '+=0.05')
+      // Phase 1b — brandName 글자 stagger
+      tl.to('[data-pp-name]', {
+        opacity: 1,
+        y: 0,
+        duration: 0.75,
+        ease: 'power4.out',
+        stagger: 0.04,
+      }, '+=0.05')
 
-    // Phase 2 — 텍스트 exit
-    tl.to('[data-pp-text]', {
-      opacity: 0,
-      y: -18,
-      duration: 0.45,
-      ease: 'power2.in',
-    }, '+=0.7')
+      // Phase 2 — 텍스트 exit
+      tl.to('[data-pp-text]', {
+        opacity: 0,
+        y: -18,
+        duration: 0.45,
+        ease: 'power2.in',
+      }, '+=0.7')
+    }, overlayRef)
 
-    // Phase 3 — Radial reveal
+    // Phase 3 — Radial reveal (mask는 overlay 전체에 적용, ctx 밖)
     tl.add(() => {
-      let r = 0
       const target = Math.hypot(window.innerWidth, window.innerHeight)
       const feather = 90
       const dur = 900
@@ -90,7 +92,7 @@ export default function PagePreloader({
       const animate = (now: number) => {
         const p = Math.min((now - start) / dur, 1)
         const eased = 1 - Math.pow(1 - p, 3)
-        r = eased * target
+        const r = eased * target
         const grad = `radial-gradient(circle at 50% 50%, transparent ${r}px, ${bgColor} calc(${r}px + ${feather}px))`
         overlay.style.maskImage = grad
         ;(overlay.style as CSSStyleDeclaration & { webkitMaskImage: string }).webkitMaskImage = grad
@@ -98,13 +100,16 @@ export default function PagePreloader({
           requestAnimationFrame(animate)
         } else {
           overlay.style.opacity = '0'
-          setTimeout(onDone, 300)
+          setTimeout(() => {
+            shownSet.add(variantId)  // 완료 후 추가 — StrictMode 2nd mount가 재실행해도 안전
+            onDone()
+          }, 300)
         }
       }
       requestAnimationFrame(animate)
     }, '+=0.1')
 
-    return () => { tl.kill() }
+    return () => { tl.kill(); ctx.revert() }
   }, [variantId, onDone, bgColor])
 
   const letters = brandName.split('')
