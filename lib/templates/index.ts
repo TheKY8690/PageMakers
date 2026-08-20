@@ -3,6 +3,9 @@ import type { TemplateProps, TemplateId } from './types'
 import TemplateA from '@/components/templates/TemplateA'
 import TemplateB from '@/components/templates/TemplateB'
 import TemplateC from '@/components/templates/TemplateC'
+import Variant1 from '@/components/requests/4f307aca-b8c2-4144-8fba-9451864a1278/Variant1'
+import Variant2 from '@/components/requests/4f307aca-b8c2-4144-8fba-9451864a1278/Variant2'
+import Variant3 from '@/components/requests/4f307aca-b8c2-4144-8fba-9451864a1278/Variant3'
 
 // ─── 개발자 참고용 베이스 템플릿 (내부용) ─────────────────────────────────
 export const templateRegistry: Record<TemplateId, {
@@ -30,11 +33,6 @@ export const templateRegistry: Record<TemplateId, {
 export const TEMPLATE_IDS = Object.keys(templateRegistry) as TemplateId[]
 
 // ─── 요청별 커스텀 variant 레지스트리 ─────────────────────────────────────
-// 새 요청 처리 시 여기에 추가:
-// import { ZoeYoonV1, ZoeYoonV2, ZoeYoonV3 } from '@/components/requests/4f307aca.../index'
-// '4f307aca-...': [
-//   { id: '4f307aca-v1', label: '...', description: '...', component: ZoeYoonV1 },
-// ]
 
 export const requestVariants: Record<string, Array<{
   id: string
@@ -42,8 +40,26 @@ export const requestVariants: Record<string, Array<{
   description: string
   component: ComponentType<TemplateProps>
 }>> = {
-  // ZoeYoon variants — 빌드 후 주석 해제
-  // '4f307aca-b8c2-4144-8fba-9451864a1278': []
+  '4f307aca-b8c2-4144-8fba-9451864a1278': [
+    {
+      id: '4f307aca-v1',
+      label: '다크 시네마틱',
+      description: '강렬한 대비 · 영화적 연출',
+      component: Variant1,
+    },
+    {
+      id: '4f307aca-v2',
+      label: '화이트 스튜디오',
+      description: '여백 중심 · 사진집 감성',
+      component: Variant2,
+    },
+    {
+      id: '4f307aca-v3',
+      label: '컬러 볼드',
+      description: '진홍 컬러 dominant · 스플릿 레이아웃',
+      component: Variant3,
+    },
+  ],
 }
 
 // 발행 페이지에서 variant ID로 컴포넌트 조회
