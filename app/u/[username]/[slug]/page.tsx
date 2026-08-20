@@ -120,6 +120,7 @@ export default async function PortfolioPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* eslint-disable-next-line react-hooks/static-components */}
       <Template
         brandName={request.brandName}
         brandDescription={request.brandDescription}
