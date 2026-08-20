@@ -32,6 +32,35 @@ export default function TemplateSection({
 }: Props) {
   const [showPicker, setShowPicker] = useState(false)
 
+  // 진행 상태 안내 카드 (시안 노출 전)
+  if (status === 'waiting') {
+    return (
+      <div style={{ marginTop: '32px', padding: '24px', background: '#FAFAFA', border: '1px solid rgba(12,12,12,0.08)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#5B21B6', flexShrink: 0 }} />
+          <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.04em', color: '#5B21B6' }}>작업대기중</span>
+        </div>
+        <p style={{ margin: 0, fontSize: '14px', color: 'rgba(12,12,12,0.55)', lineHeight: 1.7 }}>
+          요청을 검토하고 있습니다.<br />제작 준비가 되면 알림 드리겠습니다.
+        </p>
+      </div>
+    )
+  }
+
+  if (status === 'in_progress') {
+    return (
+      <div style={{ marginTop: '32px', padding: '24px', background: '#FAFAFA', border: '1px solid rgba(12,12,12,0.08)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0C0C0C', flexShrink: 0 }} />
+          <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.04em', color: '#0C0C0C' }}>작업중</span>
+        </div>
+        <p style={{ margin: 0, fontSize: '14px', color: 'rgba(12,12,12,0.55)', lineHeight: 1.7 }}>
+          현재 맞춤 시안을 제작하고 있습니다.<br />완성되면 선택 요청 드리겠습니다.
+        </p>
+      </div>
+    )
+  }
+
   if (status !== 'template_selection') return null
 
   // 선택 완료 + 재선택 안 한 상태

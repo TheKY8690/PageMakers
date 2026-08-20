@@ -55,7 +55,7 @@ const CSS = `
   }
   @media (max-width: 768px) {
     .v2-nav { padding: 16px 20px !important; }
-    .v2-hero { padding: 80px 20px 40px !important; }
+    .v2-hero { padding: 32px 20px 40px !important; }
     .v2-hero-name { font-size: clamp(56px, 14vw, 100px) !important; }
     .v2-stmt-wrap { padding: 60px 20px !important; }
     .v2-stmt-grid { grid-template-columns: 1fr !important; }
@@ -134,7 +134,7 @@ export default function Variant2({
       <header
         className="v2-nav"
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+          position: 'sticky', top: 0, zIndex: 100,
           padding: '18px 48px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           background: 'rgba(255,255,255,0.92)',
@@ -163,7 +163,7 @@ export default function Variant2({
       {/* ── Hero ── */}
       <section
         className="v2-hero"
-        style={{ padding: '120px 48px 0' }}
+        style={{ padding: '48px 48px 0' }}
       >
         {/* Sub caption */}
         <p
@@ -212,7 +212,7 @@ export default function Variant2({
             <img
               src={mainImageUrl}
               alt={`${brandName} 대표 이미지`}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
             />
           </div>
         )}
