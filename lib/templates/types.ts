@@ -11,6 +11,7 @@ export interface TemplateProps {
   mainImageUrl?: string | null // hero signed URL
   contacts?: Contact[]
   websiteType?: string
+  isPreview?: boolean         // 카드 축소 미리보기 모드 — 애니메이션 비활성화
 }
 
 export type TemplateId =

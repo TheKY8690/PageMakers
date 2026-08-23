@@ -103,6 +103,7 @@ export default function Variant3({
   mainImageUrl,
   contacts = [],
   websiteType,
+  isPreview = false,
 }: TemplateProps) {
   const [preloaderDone, setPreloaderDone] = useState(false)
   const pageRef = useRef<HTMLDivElement>(null)
@@ -114,6 +115,7 @@ export default function Variant3({
   const finalLine = descLines[2] ?? ''
 
   useEffect(() => {
+    if (isPreview) return
     const el = pageRef.current
     if (!el) return
     const targets = el.querySelectorAll<HTMLElement>('.v3-reveal')
@@ -125,16 +127,25 @@ export default function Variant3({
     )
     targets.forEach((t) => io.observe(t))
     return () => io.disconnect()
-  }, [])
+  }, [isPreview])
 
   return (
     <div
       ref={pageRef}
+      {...(isPreview ? { 'data-v3-preview': '' } : {})}
       style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", minHeight: '100vh', background: '#0C0C0C', color: '#F5F5F5' }}
     >
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      {isPreview && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          [data-v3-preview] .v3-hero-eyebrow,
+          [data-v3-preview] .v3-hero-name,
+          [data-v3-preview] .v3-hero-tagline { animation: none !important; opacity: 1 !important; transform: none !important; }
+          [data-v3-preview] .v3-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+        `}} />
+      )}
 
-      {!preloaderDone && (
+      {!isPreview && !preloaderDone && (
         <PagePreloader
           brandName={brandName}
           descriptor={tagline}

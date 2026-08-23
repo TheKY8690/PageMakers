@@ -2,103 +2,125 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { TemplateProps } from '@/lib/templates/types'
 import PagePreloader from './PagePreloader'
 
+gsap.registerPlugin(ScrollTrigger)
+
 const VARIANT_ID = '4f307aca-v1'
-
-const CSS = `
-  @keyframes v1SlideUp {
-    from { clip-path: inset(0 0 100% 0); opacity: 0; }
-    to   { clip-path: inset(0 0 0% 0);   opacity: 1; }
-  }
-  @keyframes v1FadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  .v1-hero-line { overflow: hidden; }
-  .v1-hero-name {
-    display: block;
-    animation: v1SlideUp 1.1s cubic-bezier(0.16,1,0.3,1) both;
-  }
-  .v1-hero-meta { animation: v1FadeIn 0.8s ease 0.8s both; }
-  .v1-reveal {
-    opacity: 0;
-    transform: translateY(32px) scale(1.03);
-    filter: blur(5px);
-    transition: opacity 1s cubic-bezier(0.16,1,0.3,1),
-                transform 1s cubic-bezier(0.16,1,0.3,1),
-                filter 1s cubic-bezier(0.16,1,0.3,1);
-  }
-  .v1-reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-
-  .v1-img-wrap { overflow: hidden; position: relative; }
-  .v1-img-wrap img {
-    display: block; width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.9s cubic-bezier(0.16,1,0.3,1), filter 0.9s ease;
-    filter: saturate(0.7);
-  }
-  .v1-img-wrap:hover img { transform: scale(1.06) translateY(-4px); filter: saturate(1); }
-  .v1-img-num {
-    position: absolute; top: 14px; left: 14px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.3);
-    transition: color 0.3s ease;
-  }
-  .v1-img-wrap:hover .v1-img-num { color: #940000; }
-
-  .v1-ticker {
-    display: flex; gap: 48px; white-space: nowrap; align-items: center;
-    animation: v1Ticker 18s linear infinite;
-  }
-  @keyframes v1Ticker {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-
-  .v1-contact-row {
-    display: flex; align-items: baseline; gap: 24px;
-    border-bottom: 1px solid rgba(245,245,245,0.06);
-    padding: 22px 0;
-    transition: background 0.2s ease;
-  }
-  .v1-contact-row:hover { background: rgba(148,0,0,0.06); padding-left: 12px; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .v1-hero-name, .v1-hero-meta, .v1-reveal {
-      animation: none !important; transition: none !important;
-      opacity: 1 !important; transform: none !important; clip-path: none !important;
-    }
-    .v1-ticker { animation: none !important; }
-    .v1-img-wrap img { transition: none !important; }
-  }
-  .v1-masonry { columns: 2; column-gap: 3px; }
-  .v1-masonry-3 { columns: 3; column-gap: 3px; }
-  .v1-masonry-item { break-inside: avoid; margin-bottom: 3px; }
-  .v1-masonry img, .v1-natural img { height: auto !important; object-fit: initial !important; }
-
-  @media (max-width: 768px) {
-    .v1-nav { padding: 16px 20px !important; }
-    .v1-hero-inner { padding: 0 20px 48px !important; }
-    .v1-statement { padding: 60px 20px !important; }
-    .v1-stmt-grid { grid-template-columns: 1fr !important; }
-    .v1-stmt-sidebar { display: none !important; }
-    .v1-gallery { padding: 60px 20px !important; }
-    .v1-gallery-grid { grid-template-columns: 1fr !important; }
-    .v1-gallery-grid .v1-img-wrap { grid-column: span 1 !important; height: 260px !important; }
-    .v1-accent { padding: 28px 20px !important; overflow: hidden; }
-    .v1-contact-section { padding: 60px 20px !important; }
-    .v1-footer { padding: 24px 20px !important; }
-    .v1-masonry { columns: 1 !important; }
-    .v1-masonry-3 { columns: 1 !important; }
-  }
-`
 
 const CONTACT_LABELS: Record<string, string> = {
   phone: '전화', kakao: '카카오', instagram: 'Instagram',
   naver: '네이버', youtube: 'YouTube', facebook: 'Facebook',
   twitter: 'X', tiktok: 'TikTok',
 }
+
+// ── Fallback creative copy (photography portfolio tone) ──────────────────
+const QUOTE_FALLBACK = '빛이 머문 자리에 이야기가 남는다'
+const QUOTE_SUB_FALLBACK = '카메라는 기억보다 정직하고, 눈보다 솔직합니다.\n그 순간의 온도를 오래 간직하는 일.'
+
+const CSS = `
+  @keyframes v1Ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .v1-ticker {
+    display: flex; gap: 56px; white-space: nowrap; align-items: center;
+    animation: v1Ticker 24s linear infinite;
+  }
+
+  /* ── Curtain image (INTRO mainImage only — parallax) ── */
+  .v1-curtain { overflow: hidden; position: relative; }
+  .v1-curtain img {
+    position: absolute; inset: 0;
+    width: 100%; height: 115%;
+    object-fit: cover; object-position: center top;
+    filter: saturate(0.92);
+    will-change: transform;
+  }
+
+  /* ── Featured cards [0~2] — natural ratio ── */
+  .v1-card { overflow: hidden; position: relative; background: #111; }
+  .v1-card img {
+    width: 100%; height: auto; display: block;
+    object-fit: initial;
+    filter: saturate(0.85);
+    transform-origin: center;
+    transition: filter 1.2s ease, transform 1.1s ease;
+    will-change: transform, filter;
+  }
+  .v1-card:hover img { filter: saturate(1); transform: scale(1.01); }
+
+  /* ── Expandable flex gallery [3+] ── */
+  .v1-gallery { display: flex; gap: 6px; height: 52vh; padding: 0 64px; overflow: hidden; }
+  .v1-gallery-item { overflow: hidden; position: relative; cursor: pointer; }
+  .v1-gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
+  .v1-gallery-item:hover img { transform: scale(1.05); }
+
+  .v1-img-num {
+    position: absolute; top: 14px; left: 14px; z-index: 2;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.22); pointer-events: none;
+    transition: color 0.3s ease; mix-blend-mode: screen;
+  }
+  .v1-curtain:hover .v1-img-num { color: rgba(255,255,255,0.6); }
+
+  /* ── Text split ── */
+  .v1-char-wrap { display: inline-block; overflow: hidden; vertical-align: bottom; }
+  .v1-char { display: inline-block; will-change: transform; }
+  .v1-word-wrap { display: inline-block; overflow: hidden; vertical-align: bottom; }
+  .v1-word { display: inline-block; will-change: transform; }
+
+  /* ── Quote word scrub ── */
+  .v1-qword { display: inline; opacity: 0.1; will-change: opacity; }
+
+  /* ── Contact ── */
+  .v1-contact-row {
+    display: flex; align-items: baseline; gap: 24px;
+    border-bottom: 1px solid rgba(245,245,245,0.06);
+    padding: 22px 0;
+    transition: padding-left 0.4s cubic-bezier(0.16,1,0.3,1);
+    cursor: default;
+  }
+  .v1-contact-row:hover { padding-left: 18px; }
+
+  /* ── Scroll indicator ── */
+  .v1-scroll-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: v1ScrollHint 2s ease-in-out infinite;
+  }
+  @keyframes v1ScrollHint {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 0.7; transform: translateY(6px); }
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .v1-ticker, .v1-scroll-hint { animation: none !important; }
+    .v1-curtain img, .v1-contact-row { transition: none !important; }
+    .v1-char, .v1-word { transform: none !important; opacity: 1 !important; }
+    .v1-qword { opacity: 1 !important; }
+    .v1-curtain { clip-path: none !important; }
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 768px) {
+    .v1-hero-inner { padding: 0 24px 56px !important; }
+    .v1-nav-inner { padding: 20px 24px !important; }
+    .v1-intro-grid { grid-template-columns: 1fr !important; }
+    .v1-intro-img { height: 70vw !important; }
+    .v1-intro-right { padding: 40px 24px 56px !important; }
+    .v1-quote-section { padding: 80px 24px !important; }
+    .v1-contact-section { padding: 80px 24px !important; }
+    .v1-footer-inner { padding: 24px !important; }
+    .v1-gallery { padding: 0 24px !important; height: 50vw !important; }
+    .v1-card-wrap { padding: 0 24px !important; }
+    .v1-card-grid { padding: 0 24px !important; grid-template-columns: 1fr !important; }
+    .v1-gallery-header { padding: 0 24px !important; }
+  }
+`
 
 export default function Variant1({
   brandName,
@@ -108,64 +130,183 @@ export default function Variant1({
   mainImageUrl,
   contacts = [],
   websiteType,
+  isPreview = false,
 }: TemplateProps) {
-  const [preloaderDone, setPreloaderDone] = useState(false)
-  const pageRef = useRef<HTMLDivElement>(null)
-  const heroImgRef = useRef<HTMLImageElement>(null)
-  const accent = brandColors[0] ?? '#940000'
+  const [preloaderDone, setPreloaderDone] = useState(isPreview)
+  const [hoveredGalleryIdx, setHoveredGalleryIdx] = useState<number | null>(null)
 
-  // brandDescription 파싱
+  const containerRef = useRef<HTMLDivElement>(null)
+  const navRef       = useRef<HTMLElement>(null)
+  const heroNameRef  = useRef<HTMLDivElement>(null)
+  const heroTagRef   = useRef<HTMLDivElement>(null)
+  const heroMetaRef  = useRef<HTMLDivElement>(null)
+  const scrollerRef  = useRef<HTMLElement | Window | null>(null)
+
+  const accent    = brandColors[0] ?? '#940000'
   const descLines = brandDescription.split(/\r?\n/).filter(Boolean)
-  const tagline = descLines[0] ?? ''
-  const bodyLines = descLines.slice(1)
+  const tagline   = descLines[0] ?? brandName
 
-  useEffect(() => {
-    const el = pageRef.current
-    if (!el) return
-    const targets = el.querySelectorAll<HTMLElement>('.v1-reveal')
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target) }
-      }),
-      { rootMargin: '-60px' }
-    )
-    targets.forEach((t) => io.observe(t))
-    return () => io.disconnect()
-  }, [])
-
-  // 히어로 이미지 패럴랙스
-  useEffect(() => {
-    const img = heroImgRef.current
-    if (!img) return
-    // 가장 가까운 스크롤 컨테이너 탐지 (admin overlay vs window)
-    let node: HTMLElement | null = img.parentElement
-    let scroller: HTMLElement | Window = window
-    while (node) {
-      const { overflow, overflowY } = getComputedStyle(node)
-      if (overflow === 'auto' || overflow === 'scroll' || overflowY === 'auto' || overflowY === 'scroll') {
-        scroller = node
-        break
-      }
-      node = node.parentElement
-    }
-    const onScroll = () => {
-      const scrolled = scroller instanceof Window ? window.scrollY : (scroller as HTMLElement).scrollTop
-      img.style.transform = `translateY(${scrolled * 0.22}px) scale(1.01)`
-    }
-    scroller.addEventListener('scroll', onScroll, { passive: true })
-    return () => scroller.removeEventListener('scroll', onScroll)
-  }, [])
+  // Last line 20자 이상이면 philosophy quote로 분리
+  const lastLine  = descLines[descLines.length - 1] ?? ''
+  const useLastAsQuote = descLines.length > 1 && lastLine.length >= 20
+  const bioLines  = useLastAsQuote ? descLines.slice(1, -1) : descLines.slice(1)
+  const quoteText = useLastAsQuote ? lastLine : QUOTE_FALLBACK
+  const quoteSub  = QUOTE_SUB_FALLBACK
 
   const instagramContact = contacts.find((c) => c.type === 'instagram')
 
+  // ── Detect scroll container ───────────────────────────────────────────
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    let node: HTMLElement | null = el.parentElement
+    while (node && node !== document.documentElement) {
+      const { overflow, overflowY } = getComputedStyle(node)
+      if (['auto', 'scroll'].includes(overflow) || ['auto', 'scroll'].includes(overflowY)) {
+        scrollerRef.current = node
+        return
+      }
+      node = node.parentElement
+    }
+    scrollerRef.current = window
+  }, [])
+
+  // ── Hero entrance (post-preloader, immediate — no scroll) ─────────────
+  useEffect(() => {
+    if (!preloaderDone || isPreview) return
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    // Nav slides down
+    if (navRef.current) {
+      tl.fromTo(navRef.current, { y: -28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, 0)
+    }
+    // Brand name — chars slide up from clip mask
+    const chars = heroNameRef.current?.querySelectorAll<HTMLElement>('.v1-char')
+    if (chars?.length) {
+      tl.fromTo(chars, { y: '115%' }, { y: '0%', duration: 1.3, stagger: 0.028 }, 0.1)
+    }
+    // Tagline — words stagger up
+    const words = heroTagRef.current?.querySelectorAll<HTMLElement>('.v1-word')
+    if (words?.length) {
+      tl.fromTo(words, { y: '75%', opacity: 0 }, { y: '0%', opacity: 1, duration: 1.0, stagger: 0.05 }, 0.4)
+    }
+    // Meta row
+    if (heroMetaRef.current) {
+      tl.fromTo(heroMetaRef.current, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7 }, 0.85)
+    }
+  }, [preloaderDone])
+
+  // ── Scroll-driven animations ──────────────────────────────────────────
+  useEffect(() => {
+    if (!preloaderDone || !containerRef.current || isPreview) return
+    const scroller = scrollerRef.current ?? window
+
+    const ctx = gsap.context(() => {
+
+      // ── INTRO mainImage — curtain reveal + parallax ──
+      const curtains = gsap.utils.toArray<HTMLElement>('[data-v1-curtain]', containerRef.current!)
+      curtains.forEach((wrap) => {
+        const img = wrap.querySelector<HTMLElement>('img')
+        gsap.set(wrap, { clipPath: 'inset(0 0 100% 0)' })
+        gsap.to(wrap, {
+          clipPath: 'inset(0 0 0% 0)',
+          duration: 1.5, ease: 'power3.inOut',
+          scrollTrigger: { trigger: wrap, start: 'top 88%', scroller },
+        })
+        if (img) {
+          gsap.fromTo(img, { y: '0%' }, {
+            y: '-13%', ease: 'none',
+            scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'bottom top', scrub: 1.8, scroller },
+          })
+        }
+      })
+
+      // ── Featured cards [data-v1-card] — curtain reveal + scale ──
+      const cards = gsap.utils.toArray<HTMLElement>('[data-v1-card]', containerRef.current!)
+      cards.forEach((card) => {
+        const img = card.querySelector<HTMLElement>('img')
+        gsap.set(card, { clipPath: 'inset(0 0 100% 0)' })
+        gsap.to(card, {
+          clipPath: 'inset(0 0 0% 0)',
+          duration: 1.4, ease: 'power3.inOut',
+          scrollTrigger: { trigger: card, start: 'top 90%', scroller },
+        })
+        if (img) {
+          gsap.fromTo(img,
+            { scale: 1.04 },
+            { scale: 1, duration: 1.4, ease: 'power2.out',
+              scrollTrigger: { trigger: card, start: 'top 90%', scroller } }
+          )
+        }
+      })
+
+      // ── Intro right: meta labels fade + bio words reveal ──
+      const introRight = containerRef.current!.querySelector('.v1-intro-right')
+      if (introRight) {
+        gsap.fromTo(introRight.querySelectorAll<HTMLElement>('.v1-intro-meta'),
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'power2.out',
+            scrollTrigger: { trigger: introRight, start: 'top 75%', scroller } }
+        )
+        const bioWords = introRight.querySelectorAll<HTMLElement>('.v1-bio-word')
+        if (bioWords.length) {
+          gsap.fromTo(bioWords, { y: '100%' }, {
+            y: '0%', duration: 0.9, stagger: 0.022, ease: 'power2.out',
+            scrollTrigger: { trigger: introRight, start: 'top 72%', scroller },
+          })
+        }
+        gsap.fromTo(introRight.querySelectorAll<HTMLElement>('.v1-intro-swatches'),
+          { opacity: 0 },
+          { opacity: 1, duration: 0.6, ease: 'power2.out',
+            scrollTrigger: { trigger: introRight, start: 'top 60%', scroller } }
+        )
+      }
+
+      // ── Philosophy quote word scrub ──
+      const quoteEl = containerRef.current!.querySelector('.v1-quote-section')
+      if (quoteEl) {
+        gsap.to(quoteEl.querySelectorAll<HTMLElement>('.v1-qword'), {
+          opacity: 1, stagger: 0.09, ease: 'none',
+          scrollTrigger: { trigger: quoteEl, start: 'top 72%', end: 'center 28%', scrub: 1.8, scroller },
+        })
+        const sub = quoteEl.querySelector('.v1-quote-sub')
+        if (sub) {
+          gsap.fromTo(sub, { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+              scrollTrigger: { trigger: quoteEl, start: 'center 60%', scroller } }
+          )
+        }
+      }
+
+      // ── Contact stagger from left ──
+      const contactEl = containerRef.current!.querySelector('.v1-contact-section')
+      if (contactEl) {
+        const label = contactEl.querySelector('.v1-contact-label')
+        if (label) {
+          gsap.fromTo(label, { opacity: 0 },
+            { opacity: 1, duration: 0.6, scrollTrigger: { trigger: contactEl, start: 'top 80%', scroller } }
+          )
+        }
+        gsap.fromTo(contactEl.querySelectorAll<HTMLElement>('.v1-contact-row'),
+          { opacity: 0, x: -36 },
+          { opacity: 1, x: 0, stagger: 0.09, duration: 0.8, ease: 'power2.out',
+            scrollTrigger: { trigger: contactEl, start: 'top 80%', scroller } }
+        )
+      }
+
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [preloaderDone])
+
   return (
     <div
-      ref={pageRef}
+      ref={containerRef}
       style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", minHeight: '100vh', background: '#0C0C0C', color: '#F5F5F5' }}
     >
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      {!preloaderDone && (
+      {!isPreview && !preloaderDone && (
         <PagePreloader
           brandName={brandName}
           descriptor={tagline}
@@ -176,316 +317,305 @@ export default function Variant1({
         />
       )}
 
-      {/* ── Hero ── */}
+      {/* ════════════════════════════════════════════════════════
+          1. HERO — Typography only, bottom-aligned
+      ════════════════════════════════════════════════════════ */}
       <section
         style={{
-          position: 'relative',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
+          position: 'relative', minHeight: '100vh',
+          display: 'flex', flexDirection: 'column',
+          background: `linear-gradient(160deg, #0C0C0C 70%, ${accent}12)`,
           overflow: 'hidden',
         }}
       >
         {/* Nav */}
         <header
-          className="v1-nav"
+          ref={navRef}
+          className="v1-nav-inner"
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
-            padding: '20px 48px',
+            padding: '22px 48px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            opacity: 0,
           }}
         >
-          <span
-            style={{
-              fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em',
-              textTransform: 'uppercase', color: 'rgba(245,245,245,0.55)',
-            }}
-          >
+          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.4)' }}>
             {brandName}
           </span>
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
             {instagramContact && (
-              <span style={{ fontSize: '12px', color: 'rgba(245,245,245,0.35)', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: '11px', color: 'rgba(245,245,245,0.3)', letterSpacing: '0.04em' }}>
                 {instagramContact.value}
               </span>
             )}
-            <span
-              style={{
-                fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase',
-                color: accent, fontWeight: 600,
-              }}
-            >
+            <span style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: accent, fontWeight: 600 }}>
               {websiteType ?? 'Portfolio'}
             </span>
           </div>
         </header>
 
-        {/* Main image */}
-        {mainImageUrl && (
-          <>
-            <img
-              ref={heroImgRef}
-              src={mainImageUrl}
-              alt={`${brandName} 대표 이미지`}
-              style={{
-                position: 'absolute', inset: 0,
-                width: '100%', height: '115%',
-                objectFit: 'cover', objectPosition: 'center top',
-                opacity: 0.32,
-                filter: 'saturate(0.4)',
-                willChange: 'transform',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(to top, #0C0C0C 32%, rgba(12,12,12,0.05) 65%)',
-              }}
-            />
-          </>
-        )}
-        {!mainImageUrl && (
-          <div
-            style={{
-              position: 'absolute', inset: 0,
-              background: `linear-gradient(140deg, #0C0C0C 55%, ${accent}22)`,
-            }}
-          />
-        )}
-
-        {/* Hero text */}
+        {/* Typography — bottom-aligned */}
         <div
           className="v1-hero-inner"
-          style={{ position: 'relative', padding: '0 48px 64px' }}
+          style={{ marginTop: 'auto', position: 'relative', padding: '0 48px 88px' }}
         >
-          {/* Tagline — editorial headline */}
-          <h1
-            className="v1-hero-meta"
-            style={{
-              fontSize: 'clamp(36px, 5.5vw, 72px)',
-              fontWeight: 800,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
-              color: '#F5F5F5',
-              margin: '0 0 20px',
-              padding: 0,
-            }}
-          >
-            {tagline}
-          </h1>
-
-          {/* Brand name — small caption */}
-          <p
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: accent,
-              margin: '0 0 24px',
-              fontWeight: 600,
-            }}
-          >
-            {brandName}
-          </p>
-
-          {/* Color strip */}
-          <div style={{ display: 'flex', gap: '3px' }}>
-            {brandColors.map((c, i) => (
-              <div key={i} style={{ height: '2px', width: '40px', background: c }} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Statement ── */}
-      <section
-        className="v1-statement v1-reveal"
-        style={{ background: '#F0EFE9', color: '#0C0C0C', padding: '100px 48px' }}
-      >
-        <div
-          className="v1-stmt-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '200px 1fr',
-            gap: '60px',
-            maxWidth: '1100px',
-          }}
-        >
-          {/* Sidebar */}
-          <div className="v1-stmt-sidebar" style={{ paddingTop: '6px' }}>
-            <p
+          {/* Brand name — char split */}
+          <div ref={heroNameRef} aria-label={brandName} style={{ marginBottom: '20px' }}>
+            <h1
               style={{
-                fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-                color: 'rgba(12,12,12,0.35)', margin: '0 0 24px',
+                fontSize: 'clamp(60px, 10vw, 144px)',
+                fontWeight: 800,
+                letterSpacing: '-0.055em',
+                lineHeight: 0.9,
+                color: '#F5F5F5',
+                margin: 0, padding: 0,
+                display: 'flex', flexWrap: 'wrap',
               }}
             >
-              About
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {brandColors.map((c, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: '28px', height: '28px', background: c,
-                    border: '1px solid rgba(12,12,12,0.1)',
-                  }}
-                />
+              {brandName.split('').map((char, i) => (
+                <span key={i} className="v1-char-wrap">
+                  <span className="v1-char">{char === ' ' ? '\u00A0' : char}</span>
+                </span>
               ))}
+            </h1>
+          </div>
+
+          {/* Tagline — word split */}
+          <div ref={heroTagRef} style={{ marginBottom: '40px', maxWidth: '560px' }}>
+            <p style={{ fontSize: 'clamp(14px, 1.55vw, 18px)', fontWeight: 400, lineHeight: 1.7, color: 'rgba(245,245,245,0.48)', margin: 0, letterSpacing: '-0.003em' }}>
+              {tagline.split(' ').map((word, i, arr) => (
+                <span key={i} className="v1-word-wrap">
+                  <span className="v1-word">{word}{i < arr.length - 1 ? '\u00A0' : ''}</span>
+                </span>
+              ))}
+            </p>
+          </div>
+
+          {/* Meta row */}
+          <div ref={heroMetaRef} style={{ display: 'flex', alignItems: 'center', gap: '20px', opacity: 0 }}>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {brandColors.map((c, i) => (
+                <div key={i} style={{ height: '2px', width: '32px', background: c }} />
+              ))}
+            </div>
+            <span style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, fontWeight: 600 }}>
+              {websiteType ?? 'Portfolio'}
+            </span>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div
+          style={{
+            position: 'absolute', bottom: '36px', right: '48px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+          }}
+        >
+          <span style={{ fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.22)', writingMode: 'vertical-rl' }}>
+            Scroll
+          </span>
+          <div className="v1-scroll-hint" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '1px', height: '40px', background: 'rgba(245,245,245,0.15)' }} />
+            <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: accent }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════
+          2. INTRO — mainImage (좌) + 자기소개 (우)
+      ════════════════════════════════════════════════════════ */}
+      {(mainImageUrl || bioLines.length > 0) && (
+        <section style={{ background: '#0C0C0C' }}>
+          <div
+            className="v1-intro-grid"
+            style={{ display: 'grid', gridTemplateColumns: mainImageUrl ? '55fr 45fr' : '1fr', minHeight: '100vh' }}
+          >
+            {/* Left — mainImage curtain reveal */}
+            {mainImageUrl && (
+              <div
+                data-v1-curtain
+                className="v1-curtain v1-intro-img"
+                style={{ height: '100vh', position: 'sticky', top: 0 }}
+              >
+                <img src={mainImageUrl} alt={`${brandName} 대표 이미지`} />
+              </div>
+            )}
+
+            {/* Right — bio */}
+            <div
+              className="v1-intro-right"
+              style={{
+                padding: '80px 56px',
+                display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                minHeight: '100vh',
+              }}
+            >
+              <p className="v1-intro-meta" style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.28)', margin: '0 0 20px' }}>
+                About
+              </p>
+              <p className="v1-intro-meta" style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: accent, margin: '0 0 6px', fontWeight: 700 }}>
+                {brandName}
+              </p>
+              <p className="v1-intro-meta" style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.28)', margin: '0 0 44px' }}>
+                {websiteType ?? 'Portfolio'}
+              </p>
+
+              {/* Bio text — word split */}
+              <div style={{ marginBottom: '48px' }}>
+                {(bioLines.length > 0 ? bioLines : [tagline]).map((line, li) => (
+                  <p key={li} style={{ margin: '0 0 16px', lineHeight: li === 0 ? 1.35 : 1.85 }}>
+                    <span style={{
+                      display: 'block',
+                      fontSize: li === 0 ? 'clamp(20px, 2.4vw, 30px)' : '15px',
+                      fontWeight: li === 0 ? 600 : 400,
+                      letterSpacing: li === 0 ? '-0.025em' : '-0.003em',
+                      color: li === 0 ? '#F5F5F5' : 'rgba(245,245,245,0.55)',
+                    }}>
+                      {line.split(' ').map((word, wi, arr) => (
+                        <span key={wi} className="v1-word-wrap">
+                          <span className="v1-bio-word">{word}{wi < arr.length - 1 ? '\u00A0' : ''}</span>
+                        </span>
+                      ))}
+                    </span>
+                  </p>
+                ))}
+              </div>
+
+              {/* Color swatches */}
+              <div className="v1-intro-swatches" style={{ display: 'flex', gap: '10px' }}>
+                {brandColors.map((c, i) => (
+                  <div
+                    key={i}
+                    style={{ width: '28px', height: '28px', background: c, border: '1px solid rgba(245,245,245,0.08)' }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ════════════════════════════════════════════════════════
+          3a. FEATURED CARDS — imageUrls[0~2], 자연비율
+      ════════════════════════════════════════════════════════ */}
+      {imageUrls.length > 0 && (
+        <div style={{ background: '#0C0C0C', padding: '80px 0 0' }}>
+          {/* Card 0 — solo */}
+          <div className="v1-card-wrap" style={{ padding: '0 64px', marginBottom: '12px' }}>
+            <div data-v1-card className="v1-card" style={{ position: 'relative' }}>
+              <span className="v1-img-num">01</span>
+              <img src={imageUrls[0]} alt={`${brandName} 01`} />
             </div>
           </div>
 
-          {/* Description */}
-          <div>
-            {bodyLines.map((line, li) => (
-              <p
-                key={li}
-                style={{
-                  fontSize: li === 0 ? 'clamp(20px, 2.8vw, 34px)' : '16px',
-                  fontWeight: li === 0 ? 700 : 400,
-                  lineHeight: li === 0 ? 1.4 : 1.85,
-                  letterSpacing: li === 0 ? '-0.02em' : '-0.004em',
-                  color: li === 0 ? '#0C0C0C' : 'rgba(12,12,12,0.6)',
-                  margin: '0 0 16px',
-                }}
-              >
-                {line}
-              </p>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 사진 페어 — 2fr 1fr 비대칭 ── */}
-      {imageUrls.length > 0 && (
-        <section style={{ background: '#0C0C0C', padding: '0' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '3px', alignItems: 'start' }}>
-            {imageUrls.slice(0, 2).map((url, i) => (
-              <div key={i} className="v1-reveal v1-img-wrap v1-natural" style={{ transitionDelay: `${i * 0.1}s` }}>
-                <img src={url} alt={`${brandName} 작품 ${i + 1}`} />
-                <span className="v1-img-num">{String(i + 1).padStart(2, '0')}</span>
+          {/* Cards [1] + [2] — 2-col equal */}
+          {imageUrls[1] && (
+            <div className="v1-card-grid" style={{ padding: '0 64px', display: 'grid', gridTemplateColumns: imageUrls[2] ? '1fr 1fr' : '1fr', gap: '12px' }}>
+              <div data-v1-card className="v1-card" style={{ position: 'relative' }}>
+                <span className="v1-img-num">02</span>
+                <img src={imageUrls[1]} alt={`${brandName} 02`} />
               </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── Philosophy quote ── */}
-      <section className="v1-reveal" style={{ background: '#F0EFE9', color: '#0C0C0C', padding: '80px 48px' }}>
-        <div style={{ maxWidth: '680px' }}>
-          <p style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(12,12,12,0.3)', marginBottom: '28px' }}>
-            Philosophy
-          </p>
-          <blockquote style={{ margin: '0 0 24px', borderLeft: `3px solid ${accent}`, paddingLeft: '22px' }}>
-            <p style={{ fontSize: 'clamp(22px, 2.8vw, 38px)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.3, color: '#0C0C0C', margin: 0 }}>
-              좋은 사진은<br />기억보다<br />정직합니다
-            </p>
-          </blockquote>
-          <p style={{ fontSize: '15px', color: 'rgba(12,12,12,0.55)', lineHeight: 1.85, letterSpacing: '-0.003em', margin: 0, paddingLeft: '25px' }}>
-            익숙한 것들 사이에서 낯선 아름다움을 발견하는 일.<br />
-            카메라는 그 시선을 붙잡는 도구입니다.
-          </p>
-        </div>
-      </section>
-
-      {/* ── 피처드 사진 1장 ── */}
-      {imageUrls[2] && (
-        <section className="v1-reveal" style={{ background: '#0C0C0C', padding: '0 48px' }}>
-          <div className="v1-img-wrap v1-natural" style={{ maxWidth: '50%', margin: '0 auto' }}>
-            <img
-              src={imageUrls[2]}
-              alt={`${brandName} 작품 3`}
-              style={{ objectPosition: 'center top' }}
-            />
-            <span className="v1-img-num">03</span>
-          </div>
-        </section>
-      )}
-
-      {/* ── 사진 하단 — 풀로우 + 2열 ── */}
-      {imageUrls.length > 3 && (
-        <section style={{ background: '#0C0C0C', padding: '3px 48px 80px' }}>
-          {/* imageUrls[3]: 풀 너비 */}
-          <div className="v1-reveal v1-img-wrap v1-natural" style={{ marginBottom: '3px' }}>
-            <img src={imageUrls[3]} alt={`${brandName} 작품 4`} />
-            <span className="v1-img-num">04</span>
-          </div>
-          {/* imageUrls[4,5]: 2열 */}
-          {imageUrls.length > 4 && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px', alignItems: 'start' }}>
-              {imageUrls.slice(4, 6).map((url, i) => (
-                <div key={i} className="v1-reveal v1-img-wrap v1-natural" style={{ transitionDelay: `${(i + 1) * 0.08}s` }}>
-                  <img src={url} alt={`${brandName} 작품 ${i + 5}`} />
-                  <span className="v1-img-num">{String(i + 5).padStart(2, '0')}</span>
+              {imageUrls[2] && (
+                <div data-v1-card className="v1-card" style={{ position: 'relative' }}>
+                  <span className="v1-img-num">03</span>
+                  <img src={imageUrls[2]} alt={`${brandName} 03`} />
                 </div>
-              ))}
+              )}
             </div>
           )}
-        </section>
+        </div>
       )}
 
-      {/* ── Accent ticker ── */}
-      <section
-        className="v1-accent"
-        style={{
-          background: accent,
-          padding: '36px 0',
-          overflow: 'hidden',
-        }}
-      >
+      {/* ════════════════════════════════════════════════════════
+          3b. EXPANDABLE GALLERY — imageUrls[3+]
+      ════════════════════════════════════════════════════════ */}
+      {imageUrls.length > 3 && (
+        <div style={{ background: '#0C0C0C', padding: '48px 0 80px' }}>
+          <div className="v1-gallery-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 64px', marginBottom: '16px' }}>
+            <span style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.28)' }}>Works</span>
+            <span style={{ fontSize: '9px', letterSpacing: '0.12em', color: 'rgba(245,245,245,0.2)' }}>{imageUrls.length - 3} images</span>
+          </div>
+          <div className="v1-gallery">
+            {imageUrls.slice(3).map((url, i) => {
+              const flex = hoveredGalleryIdx === i
+                ? 2.5
+                : hoveredGalleryIdx !== null ? 0.5 : 1
+              return (
+                <div
+                  key={i}
+                  className="v1-gallery-item"
+                  style={{ flex, transition: 'flex 0.5s cubic-bezier(0.4,0,0.2,1)' }}
+                  onMouseEnter={() => setHoveredGalleryIdx(i)}
+                  onMouseLeave={() => setHoveredGalleryIdx(null)}
+                >
+                  <img src={url} alt={`${brandName} ${i + 4}`} />
+                  <span className="v1-img-num">{String(i + 4).padStart(2, '0')}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════
+          4. PHILOSOPHY — 브랜드 기반 quote, word scrub
+      ════════════════════════════════════════════════════════ */}
+      <section className="v1-quote-section" style={{ background: '#F0EFE9', color: '#0C0C0C', padding: '120px 48px' }}>
+        <div style={{ maxWidth: '800px' }}>
+          <p style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(12,12,12,0.28)', marginBottom: '44px' }}>
+            Philosophy
+          </p>
+          <div style={{ borderLeft: `3px solid ${accent}`, paddingLeft: '28px', marginBottom: '32px' }}>
+            <p style={{ fontSize: 'clamp(26px, 3.4vw, 54px)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
+              {quoteText.split(' ').map((word, i, arr) => (
+                <span key={i} className="v1-qword">{word}{i < arr.length - 1 ? ' ' : ''}</span>
+              ))}
+            </p>
+          </div>
+          <p
+            className="v1-quote-sub"
+            style={{ fontSize: '15px', color: 'rgba(12,12,12,0.5)', lineHeight: 1.9, letterSpacing: '-0.003em', margin: 0, paddingLeft: '31px', opacity: 0, whiteSpace: 'pre-line' }}
+          >
+            {quoteSub}
+          </p>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════
+          5. TICKER
+      ════════════════════════════════════════════════════════ */}
+      <section style={{ background: accent, padding: '36px 0', overflow: 'hidden' }}>
         <div className="v1-ticker">
           {Array.from({ length: 8 }).map((_, i) => (
             <span
               key={i}
-              style={{
-                fontSize: 'clamp(11px, 1.5vw, 16px)',
-                fontWeight: 500,
-                letterSpacing: '0.12em',
-                color: 'rgba(255,255,255,0.35)',
-                textTransform: 'uppercase',
-                flexShrink: 0,
-              }}
+              style={{ fontSize: 'clamp(11px, 1.4vw, 15px)', fontWeight: 500, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.32)', textTransform: 'uppercase', flexShrink: 0 }}
             >
               {tagline}
-              <span style={{ margin: '0 28px', color: 'rgba(255,255,255,0.12)' }}>—</span>
+              <span style={{ margin: '0 32px', color: 'rgba(255,255,255,0.1)' }}>—</span>
             </span>
           ))}
         </div>
       </section>
 
-      {/* ── Contact ── */}
+      {/* ════════════════════════════════════════════════════════
+          6. CONTACT
+      ════════════════════════════════════════════════════════ */}
       {contacts.length > 0 && (
-        <section
-          className="v1-contact-section"
-          style={{ background: '#111', padding: '80px 48px' }}
-        >
+        <section className="v1-contact-section" style={{ background: '#111', padding: '100px 48px' }}>
           <p
-            style={{
-              fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'rgba(245,245,245,0.22)', marginBottom: '36px',
-            }}
+            className="v1-contact-label"
+            style={{ fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.2)', marginBottom: '48px', opacity: 0 }}
           >
             Contact
           </p>
           <div style={{ maxWidth: '700px' }}>
             {contacts.map((c) => (
               <div key={c.type} className="v1-contact-row">
-                <span
-                  style={{
-                    fontSize: '10px', letterSpacing: '0.16em', textTransform: 'uppercase',
-                    color: accent, width: '90px', flexShrink: 0, fontWeight: 600,
-                  }}
-                >
+                <span style={{ fontSize: '10px', letterSpacing: '0.16em', textTransform: 'uppercase', color: accent, width: '90px', flexShrink: 0, fontWeight: 600 }}>
                   {CONTACT_LABELS[c.type] ?? c.type}
                 </span>
-                <span
-                  style={{
-                    fontSize: 'clamp(16px, 2.2vw, 26px)',
-                    fontWeight: 300,
-                    color: '#F5F5F5',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
+                <span style={{ fontSize: 'clamp(16px, 2.2vw, 28px)', fontWeight: 300, color: '#F5F5F5', letterSpacing: '-0.01em' }}>
                   {c.value}
                 </span>
               </div>
@@ -494,33 +624,19 @@ export default function Variant1({
         </section>
       )}
 
-      {/* ── Footer ── */}
+      {/* ════════════════════════════════════════════════════════
+          7. FOOTER
+      ════════════════════════════════════════════════════════ */}
       <footer
-        className="v1-footer"
-        style={{
-          background: '#0C0C0C',
-          borderTop: '1px solid rgba(245,245,245,0.06)',
-          padding: '24px 48px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
+        className="v1-footer-inner"
+        style={{ background: '#0C0C0C', borderTop: '1px solid rgba(245,245,245,0.06)', padding: '24px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}
       >
-        <span style={{ fontSize: '11px', color: 'rgba(245,245,245,0.22)', letterSpacing: '0.05em' }}>
+        <span style={{ fontSize: '11px', color: 'rgba(245,245,245,0.2)', letterSpacing: '0.05em' }}>
           © {brandName}
         </span>
         <div style={{ display: 'flex', gap: '8px' }}>
           {brandColors.map((c, i) => (
-            <span
-              key={i}
-              style={{
-                width: '10px', height: '10px',
-                background: c,
-                border: '1px solid rgba(245,245,245,0.08)',
-              }}
-            />
+            <span key={i} style={{ width: '10px', height: '10px', background: c, border: '1px solid rgba(245,245,245,0.08)', display: 'inline-block' }} />
           ))}
         </div>
       </footer>

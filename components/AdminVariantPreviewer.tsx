@@ -105,7 +105,7 @@ export default function AdminVariantPreviewer({
                   width: '333%', height: '333%',
                   pointerEvents: 'none',
                 }}>
-                  <Template {...templateProps} />
+                  <Template {...templateProps} isPreview />
                 </div>
                 {/* Hover overlay */}
                 <div

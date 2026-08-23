@@ -106,7 +106,7 @@ export default function TemplatePicker({ requestId, variants, ...templateProps }
                 aria-label={`${label} 미리보기`}
               >
                 <div style={{ transform: 'scale(0.3)', transformOrigin: 'top left', width: '333%', height: '333%', pointerEvents: 'none' }}>
-                  <Template {...templateProps} />
+                  <Template {...templateProps} isPreview />
                 </div>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.15s', background: 'rgba(0,0,0,0.04)' }}
                   onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
