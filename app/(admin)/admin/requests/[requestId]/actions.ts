@@ -68,6 +68,25 @@ export async function resetTemplateChoice(requestId: string) {
   revalidatePath('/admin/requests')
 }
 
+export async function sendInfoRequest(requestId: string, message: string) {
+  if (!message.trim()) return
+  await db
+    .update(portfolioRequests)
+    .set({ infoRequestMessage: message.trim(), infoRequestedAt: new Date() })
+    .where(eq(portfolioRequests.id, requestId))
+
+  revalidatePath(`/admin/requests/${requestId}`)
+}
+
+export async function clearInfoRequest(requestId: string) {
+  await db
+    .update(portfolioRequests)
+    .set({ infoRequestMessage: null, infoRequestedAt: null })
+    .where(eq(portfolioRequests.id, requestId))
+
+  revalidatePath(`/admin/requests/${requestId}`)
+}
+
 export async function adminCancelRequest(requestId: string) {
   await db
     .update(portfolioRequests)

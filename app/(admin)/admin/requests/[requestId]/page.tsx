@@ -8,6 +8,7 @@ import { setTemplateSelection, markDone, resetTemplateChoice, adminCancelRequest
 import * as s from '@/styles/dashboard/dashboard.css'
 import AdminVariantPreviewer from '@/components/AdminVariantPreviewer'
 import AdminStatusChanger from './AdminStatusChanger'
+import AdminInfoRequester from './AdminInfoRequester'
 import { requestVariants } from '@/lib/templates/index'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
@@ -70,6 +71,16 @@ export default async function AdminRequestDetailPage({ params }: Props) {
             <AdminStatusChanger requestId={requestId} currentStatus={status} />
           </div>
         </div>
+      </div>
+
+      {/* 추가 자료 요청 패널 */}
+      <div style={{ marginBottom: '20px' }}>
+        <AdminInfoRequester
+          requestId={requestId}
+          currentMessage={request.infoRequestMessage ?? null}
+          requestedAt={request.infoRequestedAt ?? null}
+          status={status}
+        />
       </div>
 
       {/* 상세 내용 */}

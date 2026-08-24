@@ -21,7 +21,9 @@ export const portfolioRequests = pgTable(
     contacts: jsonb('contacts').$type<{ type: string; value: string }[]>().default([]),
     selectedTemplateId: text('selected_template_id'),
     additionalRequest: text('additional_request'),
-    status: text('status').default('pending'), // pending | in_progress | done
+    infoRequestMessage: text('info_request_message'),
+    infoRequestedAt: timestamp('info_requested_at'),
+    status: text('status').default('pending'), // pending | waiting | in_progress | template_selection | done | cancelled
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
   },

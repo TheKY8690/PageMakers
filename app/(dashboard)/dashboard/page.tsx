@@ -26,6 +26,7 @@ export default async function DashboardPage() {
       brandName: portfolioRequests.brandName,
       status: portfolioRequests.status,
       createdAt: portfolioRequests.createdAt,
+      infoRequestMessage: portfolioRequests.infoRequestMessage,
     })
     .from(portfolioRequests)
     .where(eq(portfolioRequests.userId, user!.id))
@@ -68,6 +69,11 @@ export default async function DashboardPage() {
                     <td className={s.td}>{req.brandName}</td>
                     <td className={s.td}>
                       <span className={badge.className}>{badge.label}</span>
+                      {req.infoRequestMessage && (
+                        <span style={{ marginLeft: '6px', fontSize: '10px', fontWeight: 600, color: '#EA580C', letterSpacing: '0.04em' }}>
+                          📌 확인 필요
+                        </span>
+                      )}
                     </td>
                     <td className={s.td}>{date}</td>
                     <td className={s.td}>

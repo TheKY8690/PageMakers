@@ -7,6 +7,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { and, eq } from 'drizzle-orm'
 import { cancelRequest } from './actions'
 import TemplateSection from './TemplateSection'
+import AdditionalInfoForm from './AdditionalInfoForm'
 import * as s from '@/styles/dashboard/dashboard.css'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
@@ -76,6 +77,15 @@ export default async function RequestDetailPage({ params }: Props) {
         </h1>
         <span className={badge.className}>{badge.label}</span>
       </div>
+
+      {/* 추가 자료 요청 배너 */}
+      {request.infoRequestMessage && (
+        <AdditionalInfoForm
+          requestId={requestId}
+          message={request.infoRequestMessage}
+          requestedAt={request.infoRequestedAt ?? null}
+        />
+      )}
 
       {/* 상세 내용 */}
       <div style={{ border: '1px solid rgba(12,12,12,0.1)', backgroundColor: '#fff', marginBottom: '24px' }}>
