@@ -87,11 +87,13 @@ export default function AdminVariantPreviewer({
               }}
             >
               {/* Scaled preview */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setPreviewing(id)}
+                onKeyDown={(e) => e.key === 'Enter' && setPreviewing(id)}
                 style={{
-                  all: 'unset', cursor: 'zoom-in',
+                  cursor: 'zoom-in',
                   display: 'block', height: '190px',
                   overflow: 'hidden', position: 'relative',
                   background: '#F8F8F8',
@@ -124,7 +126,7 @@ export default function AdminVariantPreviewer({
                     크게 보기
                   </span>
                 </div>
-              </button>
+              </div>
 
               {/* Footer */}
               <div style={{
