@@ -31,3 +31,19 @@ PageMakers 프로젝트에서 작업할 때 반드시 지켜야 하는 규칙.
 
 - **Claude는 `git commit`, `git push`를 스스로 실행하지 않는다.** 코드 수정까지만 하고, 커밋/푸시는 사용자에게 직접 하도록 안내한다
 - push 전 검증(lint/typecheck/build/test)과 PR 본문 작성이 필요하면 `per-push-pr` 스킬을 사용한다
+
+## 5. 홈페이지 제작 워크플로우
+
+`publishedPages` → `/u/[username]/[slug]` 페이지 또는 템플릿 구현 작업 시 아래 문서의 규칙을 전부 따른다.
+
+- `prompts/system.md` — 역할 정의, 사고방식, 코드 품질 기준
+- `prompts/design-principles.md` — 레퍼런스 활용 원칙, 디자인 창의성
+- `prompts/seo-geo.md` — SEO/GEO, Metadata, JSON-LD 원칙
+- `prompts/workflow.md` — 4단계 승인 workflow (파일 수정 전 반드시 1단계 분석 보고)
+- `prompts/task-template.md` — 실행 프롬프트 템플릿 (레퍼런스 URL + 프로젝트 식별자 입력)
+
+핵심 원칙:
+- 각 단계 완료 후 반드시 멈추고 사용자 승인 대기 (`1단계 승인` / `2단계 승인` / `3단계 승인`)
+- DB에 없는 정보 생성 금지 (연혁, 수상, 후기, 가격 등 임의 생성 절대 금지)
+- 레퍼런스는 복제 아닌 참고 — 브랜드 데이터 우선
+- `any` 사용 금지, 브랜드 데이터 하드코딩 금지

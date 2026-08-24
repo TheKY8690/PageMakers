@@ -89,6 +89,61 @@ export async function updateRequest(requestId: string, formData: FormData) {
   redirect(`/dashboard/requests/${requestId}`)
 }
 
+export async function getAdditionalUploadUrls(
+  requestId: string,
+  files: { name: string }[]
+): Promise<{ path: string; signedUrl: string }[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  return Promise.all(
+    files.map(async ({ name }) => {
+      const path = `${user.id}/${requestId}/additional/${Date.now()}-${name}`
+      const { data, error } = await supabaseAdmin.storage
+        .from('sendMe-images')
+        .createSignedUploadUrl(path)
+      if (error) throw error
+      return { path, signedUrl: data.signedUrl }
+    })
+  )
+}
+
+export async function submitAdditionalInfo(
+  requestId: string,
+  text: string,
+  newImagePaths: string[]
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  const [existing] = await db
+    .select({ additionalRequest: portfolioRequests.additionalRequest, imageUrls: portfolioRequests.imageUrls, status: portfolioRequests.status })
+    .from(portfolioRequests)
+    .where(and(eq(portfolioRequests.id, requestId), eq(portfolioRequests.userId, user.id)))
+
+  if (!existing) throw new Error('Not found')
+  if (existing.status === 'done' || existing.status === 'cancelled') throw new Error('Cannot submit')
+
+  const appendedText = text.trim()
+    ? (existing.additionalRequest ? existing.additionalRequest + '\n\n[추가 제출]\n' + text.trim() : text.trim())
+    : existing.additionalRequest
+
+  await db
+    .update(portfolioRequests)
+    .set({
+      additionalRequest: appendedText,
+      imageUrls: [...(existing.imageUrls ?? []), ...newImagePaths],
+      infoRequestMessage: null,
+      infoRequestedAt: null,
+    })
+    .where(and(eq(portfolioRequests.id, requestId), eq(portfolioRequests.userId, user.id)))
+
+  revalidatePath(`/dashboard/requests/${requestId}`)
+  revalidatePath('/dashboard')
+}
+
 export async function confirmTemplate(requestId: string, templateId: string) {
   const supabase = await createClient()
   const {

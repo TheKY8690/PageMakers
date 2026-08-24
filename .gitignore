@@ -60,6 +60,7 @@ Thumbs.db
 
 # local notes
 TODO.md
+Variant.md
 
 # misc logs
 *.log
@@ -67,3 +68,7 @@ TODO.md
 # test output
 test-results/
 playwright-report/
+
+#프롬프트
+prompts/
+

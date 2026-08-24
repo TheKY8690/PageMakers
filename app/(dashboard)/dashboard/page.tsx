@@ -6,10 +6,12 @@ import { eq, desc } from 'drizzle-orm'
 import * as s from '../../../styles/dashboard/dashboard.css'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
-  pending: { label: '대기중', className: s.badgePending },
-  cancelled: { label: '취소', className: s.badgeCancelled },
-  template_selection: { label: '선택요망', className: s.badgeTemplateSelection },
-  done: { label: '제작완료', className: s.badgeDone },
+  pending:            { label: '요청중',     className: s.badgePending },
+  waiting:            { label: '작업대기중', className: s.badgeWaiting },
+  in_progress:        { label: '작업중',     className: s.badgeInProgress },
+  template_selection: { label: '선택요망',   className: s.badgeTemplateSelection },
+  done:               { label: '제작완료',   className: s.badgeDone },
+  cancelled:          { label: '취소',       className: s.badgeCancelled },
 }
 
 export default async function DashboardPage() {
@@ -24,6 +26,7 @@ export default async function DashboardPage() {
       brandName: portfolioRequests.brandName,
       status: portfolioRequests.status,
       createdAt: portfolioRequests.createdAt,
+      infoRequestMessage: portfolioRequests.infoRequestMessage,
     })
     .from(portfolioRequests)
     .where(eq(portfolioRequests.userId, user!.id))
@@ -66,6 +69,11 @@ export default async function DashboardPage() {
                     <td className={s.td}>{req.brandName}</td>
                     <td className={s.td}>
                       <span className={badge.className}>{badge.label}</span>
+                      {req.infoRequestMessage && (
+                        <span style={{ marginLeft: '6px', fontSize: '10px', fontWeight: 600, color: '#EA580C', letterSpacing: '0.04em' }}>
+                          📌 확인 필요
+                        </span>
+                      )}
                     </td>
                     <td className={s.td}>{date}</td>
                     <td className={s.td}>
