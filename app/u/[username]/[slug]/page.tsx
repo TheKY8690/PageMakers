@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { db } from '@/lib/db'
-import { publishedPages, portfolioRequests } from '@/lib/db/schema'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { eq, and } from 'drizzle-orm'
 import { findVariantComponent } from '@/lib/templates/index'
 
 export const revalidate = 3600
@@ -13,21 +10,43 @@ interface Props {
 }
 
 async function getPageData(username: string, slug: string) {
-  const [page] = await db
-    .select()
-    .from(publishedPages)
-    .where(and(eq(publishedPages.username, username), eq(publishedPages.slug, slug)))
+  const { data: pageRaw } = await supabaseAdmin
+    .from('published_pages')
+    .select('id, request_id, template_id, user_id, username, slug')
+    .eq('username', username)
+    .eq('slug', slug)
+    .single()
 
-  if (!page) return null
+  if (!pageRaw) return null
 
-  const [request] = await db
-    .select()
-    .from(portfolioRequests)
-    .where(eq(portfolioRequests.id, page.requestId))
+  const { data: raw } = await supabaseAdmin
+    .from('portfolio_requests')
+    .select('brand_name, brand_description, website_type, brand_colors, main_image_url, image_urls, contacts, additional_request')
+    .eq('id', pageRaw.request_id)
+    .single()
 
-  if (!request) return null
+  if (!raw) return null
 
-  return { page, request }
+  return {
+    page: {
+      id: pageRaw.id as string,
+      requestId: pageRaw.request_id as string,
+      templateId: pageRaw.template_id as string,
+      userId: pageRaw.user_id as string | null,
+      username: pageRaw.username as string,
+      slug: pageRaw.slug as string,
+    },
+    request: {
+      brandName: raw.brand_name as string,
+      brandDescription: raw.brand_description as string,
+      websiteType: raw.website_type as string | null,
+      brandColors: (raw.brand_colors ?? []) as string[],
+      mainImageUrl: raw.main_image_url as string | null,
+      imageUrls: (raw.image_urls ?? []) as string[],
+      contacts: (raw.contacts ?? []) as { type: string; value: string }[],
+      additionalRequest: raw.additional_request as string | null,
+    },
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

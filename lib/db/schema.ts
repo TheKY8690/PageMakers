@@ -35,6 +35,12 @@ export const portfolioRequests = pgTable(
       to: 'authenticated',
       using: sql`auth.uid() = ${table.userId}`,
     }),
+    pgPolicy('public_read_published_requests', {
+      as: 'permissive',
+      for: 'select',
+      to: 'anon,authenticated',
+      using: sql`id IN (SELECT request_id FROM published_pages)`,
+    }),
   ]
 ).enableRLS()
 
