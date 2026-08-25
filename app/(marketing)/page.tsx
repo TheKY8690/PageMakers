@@ -83,8 +83,35 @@ export default function LandingPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready])
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: 'PageMakers',
+        url: 'https://pagemakers.co',
+        description: '요청서 하나로 전문가가 만드는 맞춤형 포트폴리오 페이지 서비스',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: { '@type': 'EntryPoint', urlTemplate: 'https://pagemakers.co/u/{username}/{slug}' },
+          'query-input': 'required name=username',
+        },
+      },
+      {
+        '@type': 'Organization',
+        name: 'PageMakers',
+        url: 'https://pagemakers.co',
+        description: '브랜드를 담은 포트폴리오 페이지 제작 서비스',
+      },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {!ready && (
         <LandingPreloader
           onAnimate={startAnimations}

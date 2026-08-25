@@ -350,10 +350,10 @@ export default function Variant3({
           2. HERO — oversized solid/outline mixed headline
       ════════════════════════════════════════════════════════ */}
       <section className="v3-hero">
-        {/* brandName words — solid */}
-        <span className="v3-hero-line v3-solid">
+        {/* brandName words — solid (H1 for SEO) */}
+        <h1 className="v3-hero-line v3-solid">
           {heroWords.join(' ')}
-        </span>
+        </h1>
 
         {/* tagline — outline */}
         {tagWords.length > 0 && (
@@ -470,24 +470,21 @@ export default function Variant3({
           6. STATS — dark bg + portrait + floating stats
       ════════════════════════════════════════════════════════ */}
       <section className="v3-stats v3-reveal">
-        {/* Left: stats text */}
+        {/* Left: brandName + tagline + contacts */}
         <div>
-          <p className="v3-stat-line">
-            <span className="v3-stat-accent">200+</span>
-            <span className="v3-stat-outline">PROJECTS</span>
-          </p>
-          <p className="v3-stat-line">
-            <span className="v3-stat-solid">5+</span>
-            <span className="v3-stat-outline">YEARS</span>
-          </p>
-          <p className="v3-stat-line">
-            <span className="v3-stat-outline">OF</span>
-            <span className="v3-stat-solid">VISION</span>
-          </p>
+          {tagline && (
+            <p className="v3-stat-line" style={{ marginBottom: '24px' }}>
+              {tagline.trim().toUpperCase().split(/\s+/).map((w, i) => (
+                <span key={i} className={i % 2 === 0 ? 'v3-stat-solid' : 'v3-stat-outline'}>
+                  {w}{' '}
+                </span>
+              ))}
+            </p>
+          )}
 
           {/* contacts strip */}
           {contacts.length > 0 && (
-            <div style={{ marginTop: '48px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {contacts.slice(0, 3).map((c) => (
                 <div key={c.type} style={{ display: 'flex', gap: '16px', alignItems: 'baseline' }}>
                   <span style={{ fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,243,238,0.35)', fontWeight: 700, width: '70px', flexShrink: 0 }}>

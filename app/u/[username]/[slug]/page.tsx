@@ -83,7 +83,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (request.mainImageUrl) {
     const { data: signedData } = await supabaseAdmin.storage
       .from('sendMe-images')
-      .createSignedUrl(request.mainImageUrl, 3600)
+      .createSignedUrl(request.mainImageUrl, 31536000)
     ogImageUrl = signedData?.signedUrl
   }
 
@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...(ogImageUrl ? { images: [ogImageUrl] } : {}),
     },
     alternates: {
-      canonical: `/u/${username}/${slug}`,
+      canonical: `https://${slug}.pagemakers.co`,
     },
   }
 }
@@ -121,13 +121,13 @@ export default async function PortfolioPage({ params }: Props) {
 
   // Signed URLs — mainImage
   const mainImageUrl = request.mainImageUrl
-    ? (await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(request.mainImageUrl, 3600)).data?.signedUrl ?? null
+    ? (await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(request.mainImageUrl, 31536000)).data?.signedUrl ?? null
     : null
 
   // Signed URLs — gallery images
   const imageUrls = await Promise.all(
     (request.imageUrls ?? []).map(async (path: string) => {
-      const { data } = await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(path, 3600)
+      const { data } = await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(path, 31536000)
       return data?.signedUrl ?? null
     })
   ).then(urls => urls.filter(Boolean) as string[])
@@ -150,7 +150,7 @@ export default async function PortfolioPage({ params }: Props) {
         name: `${request.brandName} | ${request.websiteType ?? 'Portfolio'}`,
         description: request.brandDescription.replace(/\r?\n/g, ' ').slice(0, 160),
         mainEntity: { '@type': 'Person', name: request.brandName },
-        url: `https://pagemakers.co/u/${username}/${slug}`,
+        url: `https://${slug}.pagemakers.co`,
       },
     ],
   }
