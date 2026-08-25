@@ -133,6 +133,9 @@ export const heroMeta = style({
   display: 'flex',
   alignItems: 'center',
   gap: '24px',
+  '@media': {
+    '(max-width: 768px)': { marginTop: '24px' },
+  },
 })
 
 export const colorDots = style({ display: 'flex', gap: '4px' })
@@ -155,7 +158,7 @@ export const filmSide = style({
   overflow: 'hidden',
   background: '#ddd',
   '@media': {
-    '(max-width: 768px)': { flex: '0 0 24%' },
+    '(max-width: 768px)': { flex: '0 0 15.5%' },
   },
 })
 
@@ -180,7 +183,7 @@ export const filmCenter = style({
   overflow: 'hidden',
   background: '#ccc',
   '@media': {
-    '(max-width: 768px)': { flex: '0 0 52%' },
+    '(max-width: 768px)': { flex: '0 0 31%' },
   },
 })
 
@@ -229,14 +232,25 @@ export const aboutLineBrandName = style({
   textTransform: 'uppercase',
   margin: '0 0 4px',
   display: 'block',
+  '@media': {
+    '(max-width: 768px)': { fontSize: 'clamp(18px, 6vw, 40px)' },
+  },
 })
 
-export const aboutStatementWrap = style({ marginBottom: '48px' })
+export const aboutStatementWrap = style({
+  marginBottom: '48px',
+  '@media': {
+    '(max-width: 768px)': { marginBottom: '28px' },
+  },
+})
 
 export const bioBorderWrap = style({
   maxWidth: '640px',
   borderLeft: '3px solid var(--v3-accent)',
   paddingLeft: '28px',
+  '@media': {
+    '(max-width: 768px)': { paddingLeft: '16px' },
+  },
 })
 
 export const bioParagraphFirst = style({
@@ -257,90 +271,150 @@ export const bioParagraphRest = style({
   letterSpacing: '-0.003em',
 })
 
-// ── PORTFOLIO CARDS ───────────────────────────────────────────────────────
-export const portfolioGrid = style({
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  '@media': {
-    '(max-width: 768px)': { gridTemplateColumns: '1fr' },
-  },
-})
-
-export const portfolioCard = style({
-  position: 'relative',
-  height: '75vh',
+// ── EXPANDABLE GALLERY ────────────────────────────────────────────────────
+export const galleryTrack = style({
+  display: 'flex',
+  height: '70vh',
   overflow: 'hidden',
-  cursor: 'default',
-  background: '#1a1a1a',
+  background: '#0C0C0C',
   '@media': {
-    '(max-width: 768px)': { height: '70vw' },
+    '(max-width: 768px)': { height: 'auto', flexDirection: 'column' },
   },
 })
 
-export const portfolioCardImg = style({
+export const galleryItem = style({
+  flex: 1,
+  position: 'relative',
+  overflow: 'hidden',
+  cursor: 'pointer',
+  transition: 'flex 0.6s cubic-bezier(0.16,1,0.3,1)',
+  '@media': {
+    '(max-width: 768px)': { flex: 'none', height: '60vw' },
+    '(prefers-reduced-motion: reduce)': { transition: 'none' },
+  },
+})
+
+export const galleryItemActive = style({ flex: 2.5 })
+export const galleryItemDim    = style({ flex: 0.35 })
+
+export const galleryImg = style({
   position: 'absolute',
   inset: 0,
   width: '100%',
   height: '100%',
   objectFit: 'cover',
   display: 'block',
-  transition: 'transform 0.8s cubic-bezier(0.16,1,0.3,1)',
+  transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1)',
   selectors: {
-    [`${portfolioCard}:hover &`]: { transform: 'scale(1.04)' },
+    [`${galleryItemActive} &`]: { transform: 'scale(1.05)' },
   },
   '@media': {
     '(prefers-reduced-motion: reduce)': { transition: 'none' },
   },
 })
 
-export const portfolioOverlay = style({
+export const galleryOverlay = style({
   position: 'absolute',
   inset: 0,
-  background: 'linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.72) 100%)',
+  background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%)',
+  transition: 'opacity 0.4s',
+  selectors: {
+    [`${galleryItemDim} &`]: { opacity: 0.5 },
+  },
 })
 
-export const portfolioCaption = style({
+export const galleryNum = style({
   position: 'absolute',
-  top: '28px',
-  left: '32px',
-  right: '32px',
-})
-
-export const portfolioCaptionSub = style({
-  fontSize: '10px',
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  color: 'rgba(255,255,255,0.55)',
-  fontWeight: 600,
-})
-
-export const portfolioLabel = style({
-  position: 'absolute',
-  bottom: '32px',
-  left: '32px',
-})
-
-export const portfolioTitle = style({
-  fontSize: 'clamp(28px, 4.5vw, 68px)',
+  bottom: '20px',
+  left: '20px',
+  fontSize: 'clamp(40px, 5vw, 80px)',
   fontWeight: 900,
-  letterSpacing: '-0.04em',
-  color: '#fff',
-  textTransform: 'uppercase',
-  lineHeight: 0.88,
-  margin: 0,
-})
-
-export const portfolioNum = style({
-  position: 'absolute',
-  bottom: '16px',
-  right: '28px',
-  fontSize: 'clamp(64px, 10vw, 130px)',
-  fontWeight: 900,
-  WebkitTextStroke: '1px rgba(255,255,255,0.2)',
+  WebkitTextStroke: '1px rgba(255,255,255,0.25)',
   color: 'transparent',
-  letterSpacing: '-0.06em',
+  letterSpacing: '-0.05em',
   lineHeight: 1,
   pointerEvents: 'none',
+  transition: 'opacity 0.4s',
+  selectors: {
+    [`${galleryItemActive} &`]: { opacity: 1 },
+    [`${galleryItemDim} &`]: { opacity: 0 },
+  },
+})
+
+// ── LIGHTBOX ───────────────────────────────────────────────────────────────
+export const lightboxOverlay = style({
+  position: 'fixed',
+  inset: 0,
+  zIndex: 1000,
+  background: 'rgba(0,0,0,0.95)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+export const lightboxImg = style({
+  maxWidth: '90vw',
+  maxHeight: '90vh',
+  objectFit: 'contain',
+  display: 'block',
+})
+
+export const lightboxClose = style({
+  position: 'absolute',
+  top: '24px',
+  right: '32px',
+  background: 'none',
+  border: 'none',
+  color: '#fff',
+  fontSize: '32px',
+  cursor: 'pointer',
+  lineHeight: 1,
+  fontFamily: 'inherit',
+  ':hover': { opacity: 0.6 },
+})
+
+export const lightboxPrev = style({
+  position: 'absolute',
+  left: '24px',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  background: 'none',
+  border: 'none',
+  color: '#fff',
+  fontSize: '40px',
+  cursor: 'pointer',
+  lineHeight: 1,
+  fontFamily: 'inherit',
+  ':hover': { opacity: 0.6 },
+  '@media': { '(max-width: 768px)': { left: '8px' } },
+})
+
+export const lightboxNext = style({
+  position: 'absolute',
+  right: '24px',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  background: 'none',
+  border: 'none',
+  color: '#fff',
+  fontSize: '40px',
+  cursor: 'pointer',
+  lineHeight: 1,
+  fontFamily: 'inherit',
+  ':hover': { opacity: 0.6 },
+  '@media': { '(max-width: 768px)': { right: '8px' } },
+})
+
+export const lightboxCounter = style({
+  position: 'absolute',
+  bottom: '24px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  fontSize: '11px',
+  letterSpacing: '0.14em',
+  color: 'rgba(255,255,255,0.4)',
+  fontWeight: 600,
+  whiteSpace: 'nowrap',
 })
 
 // ── STATS ─────────────────────────────────────────────────────────────────
@@ -383,7 +457,7 @@ export const statsPortrait = style({
   alignSelf: 'stretch',
   minHeight: '400px',
   '@media': {
-    '(max-width: 768px)': { display: 'none' },
+    '(max-width: 768px)': { minHeight: '72vw' },
   },
 })
 
@@ -479,6 +553,9 @@ export const ctaDeco = style({
   fontWeight: 300,
   color: 'rgba(12,12,12,0.15)',
   pointerEvents: 'none',
+  '@media': {
+    '(max-width: 768px)': { display: 'none' },
+  },
 })
 
 // ── FOOTER ────────────────────────────────────────────────────────────────
@@ -495,7 +572,13 @@ export const footerNav = style({
   },
 })
 
-export const footerNavLinks = style({ display: 'flex', gap: '40px' })
+export const footerNavLinks = style({
+  display: 'flex',
+  gap: '40px',
+  '@media': {
+    '(max-width: 768px)': { gap: '20px' },
+  },
+})
 
 export const footerNavLink = style({
   fontSize: '11px',

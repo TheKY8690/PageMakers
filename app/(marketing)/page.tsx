@@ -89,18 +89,18 @@ export default function LandingPage() {
       {
         '@type': 'WebSite',
         name: 'PageMakers',
-        url: 'https://pagemakers.co',
+        url: 'https://pagemaker.store',
         description: '요청서 하나로 전문가가 만드는 맞춤형 포트폴리오 페이지 서비스',
         potentialAction: {
           '@type': 'SearchAction',
-          target: { '@type': 'EntryPoint', urlTemplate: 'https://pagemakers.co/u/{username}/{slug}' },
+          target: { '@type': 'EntryPoint', urlTemplate: 'https://pagemaker.store/u/{username}/{slug}' },
           'query-input': 'required name=username',
         },
       },
       {
         '@type': 'Organization',
         name: 'PageMakers',
-        url: 'https://pagemakers.co',
+        url: 'https://pagemaker.store',
         description: '브랜드를 담은 포트폴리오 페이지 제작 서비스',
       },
     ],

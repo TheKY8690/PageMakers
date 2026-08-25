@@ -14,12 +14,6 @@ const CONTACT_LABELS: Record<string, string> = {
   twitter: 'X', tiktok: 'TikTok',
 }
 
-const PORTFOLIO_CATS = [
-  { title: 'Emotional', sub: '인물 & 감성' },
-  { title: 'Brand', sub: '브랜드 & 상업' },
-  { title: 'Nature', sub: '자연 & 풍경' },
-  { title: 'Life', sub: '라이프스타일' },
-]
 
 export default function Variant3({
   brandName,
@@ -31,6 +25,8 @@ export default function Variant3({
   isPreview = false,
 }: TemplateProps) {
   const [preloaderDone, setPreloaderDone] = useState(isPreview)
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const accent = brandColors[0] ?? '#C8A96E'
 
@@ -40,7 +36,7 @@ export default function Variant3({
 
   const filmCenter  = imageUrls[0] ?? null
   const filmSides   = imageUrls.slice(1, 5)
-  const portfolioImgs = imageUrls.slice(1, 5)
+  const galleryImgs = imageUrls
   const statsImg    = mainImageUrl
 
   const scrollTo = (id: string) => {
@@ -171,31 +167,53 @@ export default function Variant3({
       </section>
 
       {/* ════════════════════════════════════════════════════════
-          5. PORTFOLIO CARDS
+          5. EXPANDABLE GALLERY
       ════════════════════════════════════════════════════════ */}
-      {portfolioImgs.length > 0 && (
-        <section id="v3-works" className={s.portfolioGrid}>
-          {portfolioImgs.slice(0, 4).map((url, i) => {
-            const cat = PORTFOLIO_CATS[i % PORTFOLIO_CATS.length]
-            return (
-              <div
-                key={i}
-                className={`${s.portfolioCard} ${s.reveal}`}
-                style={{ transitionDelay: `${(i % 2) * 0.1}s` }}
-              >
-                <img className={s.portfolioCardImg} src={url} alt={cat.title} />
-                <div className={s.portfolioOverlay} />
-                <div className={s.portfolioCaption}>
-                  <span className={s.portfolioCaptionSub}>{cat.sub}</span>
-                </div>
-                <div className={s.portfolioLabel}>
-                  <p className={s.portfolioTitle}>{cat.title}</p>
-                </div>
-                <span className={s.portfolioNum}>{String(i + 1).padStart(2, '0')}</span>
-              </div>
-            )
-          })}
+      {galleryImgs.length > 0 && (
+        <section id="v3-works" className={`${s.galleryTrack} ${s.reveal}`}>
+          {galleryImgs.map((url, i) => (
+            <div
+              key={i}
+              className={`${s.galleryItem} ${
+                hoveredIdx === i ? s.galleryItemActive
+                : hoveredIdx !== null ? s.galleryItemDim
+                : ''
+              }`}
+              onMouseEnter={() => setHoveredIdx(i)}
+              onMouseLeave={() => setHoveredIdx(null)}
+              onClick={() => setLightboxIdx(i)}
+            >
+              <img className={s.galleryImg} src={url} alt={`${brandName} ${i + 1}`} />
+              <div className={s.galleryOverlay} />
+              <span className={s.galleryNum}>{String(i + 1).padStart(2, '0')}</span>
+            </div>
+          ))}
         </section>
+      )}
+
+      {lightboxIdx !== null && (
+        <div className={s.lightboxOverlay} onClick={() => setLightboxIdx(null)}>
+          <img
+            className={s.lightboxImg}
+            src={galleryImgs[lightboxIdx]}
+            alt={`${brandName} ${lightboxIdx + 1}`}
+            onClick={e => e.stopPropagation()}
+          />
+          <button className={s.lightboxClose} onClick={() => setLightboxIdx(null)}>×</button>
+          {galleryImgs.length > 1 && (
+            <>
+              <button
+                className={s.lightboxPrev}
+                onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImgs.length) % galleryImgs.length) }}
+              >‹</button>
+              <button
+                className={s.lightboxNext}
+                onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImgs.length) }}
+              >›</button>
+            </>
+          )}
+          <span className={s.lightboxCounter}>{lightboxIdx + 1} / {galleryImgs.length}</span>
+        </div>
       )}
 
       {/* ════════════════════════════════════════════════════════

@@ -10,10 +10,10 @@ export const config = {
   ],
 }
 
-export async function proxy(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') ?? ''
   const { pathname } = request.nextUrl
-  const BASE = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'pagemakers.co'
+  const BASE = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'pagemaker.store'
 
   // ① 서브도메인 처리 (auth 불필요, 먼저 실행)
   const isLocalhost = hostname.startsWith('localhost') || hostname.startsWith('127.0.0.1')
@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ② 기존 Supabase auth (쿠키 갱신 + /dashboard 보호)
+  // ② Supabase auth (쿠키 갱신 + /dashboard 보호)
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(

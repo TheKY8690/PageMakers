@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...(ogImageUrl ? { images: [ogImageUrl] } : {}),
     },
     alternates: {
-      canonical: `https://${slug}.pagemakers.co`,
+      canonical: `https://${slug}.pagemaker.store`,
     },
   }
 }
@@ -150,7 +150,7 @@ export default async function PortfolioPage({ params }: Props) {
         name: `${request.brandName} | ${request.websiteType ?? 'Portfolio'}`,
         description: request.brandDescription.replace(/\r?\n/g, ' ').slice(0, 160),
         mainEntity: { '@type': 'Person', name: request.brandName },
-        url: `https://${slug}.pagemakers.co`,
+        url: `https://${slug}.pagemaker.store`,
       },
     ],
   }

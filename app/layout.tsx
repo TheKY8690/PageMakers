@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   },
   description:
     '요청서 하나로, 전문가가 직접 만들어드리는 맞춤형 포트폴리오 페이지. 브랜드 컬러, 소개, 이미지를 담아 고유 URL로 즉시 공개됩니다.',
-  metadataBase: new URL('https://pagemakers.co'),
+  metadataBase: new URL('https://pagemaker.store'),
   openGraph: {
     type: 'website',
     siteName: 'PageMakers',

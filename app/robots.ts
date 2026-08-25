@@ -5,6 +5,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       { userAgent: '*', allow: '/', disallow: ['/dashboard/', '/admin/'] },
     ],
-    sitemap: 'https://pagemakers.co/sitemap.xml',
+    sitemap: 'https://pagemaker.store/sitemap.xml',
   }
 }
