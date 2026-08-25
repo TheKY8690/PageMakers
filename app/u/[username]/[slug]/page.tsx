@@ -9,21 +9,41 @@ interface Props {
   params: Promise<{ username: string; slug: string }>
 }
 
+type PublishedPageRow = {
+  id: string
+  request_id: string
+  template_id: string
+  user_id: string | null
+  username: string
+  slug: string
+}
+
+type PortfolioRequestRow = {
+  brand_name: string
+  brand_description: string
+  website_type: string | null
+  brand_colors: string[] | null
+  main_image_url: string | null
+  image_urls: string[] | null
+  contacts: { type: string; value: string }[] | null
+  additional_request: string | null
+}
+
 async function getPageData(username: string, slug: string) {
-  const { data: pageRaw } = await supabaseAdmin
+  const { data: pageRaw } = (await supabaseAdmin
     .from('published_pages')
     .select('id, request_id, template_id, user_id, username, slug')
     .eq('username', username)
     .eq('slug', slug)
-    .single()
+    .single()) as unknown as { data: PublishedPageRow | null }
 
   if (!pageRaw) return null
 
-  const { data: raw } = await supabaseAdmin
+  const { data: raw } = (await supabaseAdmin
     .from('portfolio_requests')
     .select('brand_name, brand_description, website_type, brand_colors, main_image_url, image_urls, contacts, additional_request')
     .eq('id', pageRaw.request_id)
-    .single()
+    .single()) as unknown as { data: PortfolioRequestRow | null }
 
   if (!raw) return null
 
@@ -149,7 +169,7 @@ export default async function PortfolioPage({ params }: Props) {
         imageUrls={imageUrls}
         mainImageUrl={mainImageUrl}
         contacts={contacts}
-        websiteType={request.websiteType}
+        websiteType={request.websiteType ?? undefined}
       />
     </>
   )
