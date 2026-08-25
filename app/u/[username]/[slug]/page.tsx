@@ -50,7 +50,8 @@ async function getPageData(username: string, slug: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { username, slug } = await params
+  const { username: rawUsername, slug } = await params
+  const username = decodeURIComponent(rawUsername)
   const data = await getPageData(username, slug)
   if (!data) return { title: 'Not Found' }
 
@@ -88,7 +89,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PortfolioPage({ params }: Props) {
-  const { username, slug } = await params
+  const { username: rawUsername, slug } = await params
+  const username = decodeURIComponent(rawUsername)
   const data = await getPageData(username, slug)
   if (!data) notFound()
 
