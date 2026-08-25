@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { db } from '@/lib/db'
-import { portfolioRequests } from '@/lib/db/schema'
+import { portfolioRequests, publishedPages } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { eq, desc } from 'drizzle-orm'
 import * as s from '../../../styles/dashboard/dashboard.css'
@@ -20,20 +20,70 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const requests = await db
-    .select({
-      id: portfolioRequests.id,
-      brandName: portfolioRequests.brandName,
-      status: portfolioRequests.status,
-      createdAt: portfolioRequests.createdAt,
-      infoRequestMessage: portfolioRequests.infoRequestMessage,
-    })
-    .from(portfolioRequests)
-    .where(eq(portfolioRequests.userId, user!.id))
-    .orderBy(desc(portfolioRequests.createdAt))
+  const [requests, pages] = await Promise.all([
+    db
+      .select({
+        id: portfolioRequests.id,
+        brandName: portfolioRequests.brandName,
+        status: portfolioRequests.status,
+        createdAt: portfolioRequests.createdAt,
+        infoRequestMessage: portfolioRequests.infoRequestMessage,
+      })
+      .from(portfolioRequests)
+      .where(eq(portfolioRequests.userId, user!.id))
+      .orderBy(desc(portfolioRequests.createdAt)),
+    db
+      .select({
+        id: publishedPages.id,
+        username: publishedPages.username,
+        slug: publishedPages.slug,
+        createdAt: publishedPages.createdAt,
+        brandName: portfolioRequests.brandName,
+      })
+      .from(publishedPages)
+      .leftJoin(portfolioRequests, eq(publishedPages.requestId, portfolioRequests.id))
+      .where(eq(publishedPages.userId, user!.id))
+      .orderBy(desc(publishedPages.createdAt)),
+  ])
 
   return (
     <>
+      {/* 내 페이지 */}
+      {pages.length > 0 && (
+        <section style={{ marginBottom: '48px' }}>
+          <div className={s.pageHeader} style={{ marginBottom: '16px' }}>
+            <h2 className={s.pageTitle} style={{ fontSize: '16px' }}>내 페이지</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+            {pages.map((page) => (
+              <a
+                key={page.id}
+                href={`/u/${page.username}/${page.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  border: '1px solid rgba(12,12,12,0.1)',
+                  background: '#fff',
+                  padding: '20px',
+                  textDecoration: 'none',
+                }}
+              >
+                <p style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 800, fontSize: '15px', letterSpacing: '-0.02em', color: '#0C0C0C', margin: '0 0 4px' }}>
+                  {page.brandName ?? '-'}
+                </p>
+                <p style={{ fontSize: '12px', color: 'rgba(12,12,12,0.4)', margin: '0 0 16px', fontFamily: 'monospace' }}>
+                  {page.username}.pagemakers.co
+                </p>
+                <p style={{ fontSize: '12px', color: '#0C0C0C', fontWeight: 600, margin: 0, letterSpacing: '0.02em' }}>
+                  페이지 보기 →
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>요청 목록</h1>
       </div>
