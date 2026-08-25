@@ -6,6 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { eq } from 'drizzle-orm'
 import { setTemplateSelection, markDone, resetTemplateChoice, adminCancelRequest } from './actions'
 import * as s from '@/styles/dashboard/dashboard.css'
+import * as a from '@/styles/admin/admin.css'
 import AdminVariantPreviewer from '@/components/AdminVariantPreviewer'
 import AdminStatusChanger from './AdminStatusChanger'
 import AdminInfoRequester from './AdminInfoRequester'
@@ -51,24 +52,17 @@ export default async function AdminRequestDetailPage({ params }: Props) {
 
   const contacts = (request.contacts as { type: string; value: string }[] | null) ?? []
 
-  const btnBase: React.CSSProperties = {
-    padding: '10px 20px', border: '1px solid', cursor: 'pointer',
-    fontSize: '14px', fontWeight: 500, fontFamily: 'inherit', borderRadius: '2px',
-  }
-
   return (
-    <div style={{ padding: '32px', maxWidth: '760px' }}>
+    <div className={a.pageWrapper}>
       {/* 헤더 */}
-      <div style={{ marginBottom: '32px' }}>
-        <Link href="/admin/requests" style={{ color: 'rgba(12,12,12,0.45)', fontSize: '13px', textDecoration: 'none', display: 'inline-block', marginBottom: '12px' }}>
+      <div className={a.pageHeader}>
+        <Link href="/admin/requests" className={a.backLink}>
           ← 목록
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <h1 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 800, fontSize: '20px', letterSpacing: '-0.03em', margin: 0 }}>
-            {request.brandName}
-          </h1>
+        <div className={a.titleRow}>
+          <h1 className={a.pageH1}>{request.brandName}</h1>
           <span className={badge.className}>{badge.label}</span>
-          <div style={{ marginLeft: 'auto' }}>
+          <div className={a.titleActions}>
             <AdminStatusChanger requestId={requestId} currentStatus={status} />
           </div>
         </div>
@@ -85,18 +79,18 @@ export default async function AdminRequestDetailPage({ params }: Props) {
       </div>
 
       {/* 상세 내용 */}
-      <div style={{ border: '1px solid rgba(12,12,12,0.1)', backgroundColor: '#fff', marginBottom: '24px' }}>
+      <div className={a.infoCard}>
         <Row label="홈페이지 유형" value={request.websiteType} />
         <Row label="소개" value={request.brandDescription} />
         <Row label="요청일" value={request.createdAt ? new Date(request.createdAt).toLocaleString('ko-KR') : '-'} />
         <Row
           label="대표 컬러"
           value={
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <div className={a.colorSwatchList}>
               {(request.brandColors ?? []).map((c: string, i: number) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{ width: '16px', height: '16px', borderRadius: '2px', backgroundColor: c, border: '1px solid rgba(12,12,12,0.1)' }} />
-                  <span style={{ fontSize: '13px', fontFamily: 'monospace' }}>{c.toUpperCase()}</span>
+                <div key={i} className={a.colorSwatchItem}>
+                  <div className={a.colorSwatchDot} style={{ backgroundColor: c }} />
+                  <span className={a.colorSwatchHex}>{c.toUpperCase()}</span>
                 </div>
               ))}
             </div>
@@ -106,12 +100,10 @@ export default async function AdminRequestDetailPage({ params }: Props) {
           <Row
             label="연락처"
             value={
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div className={a.contactsList}>
                 {contacts.map((c) => (
-                  <div key={c.type} style={{ fontSize: '14px' }}>
-                    <span style={{ color: 'rgba(12,12,12,0.45)', width: '90px', display: 'inline-block' }}>
-                      {CONTACT_LABELS[c.type] ?? c.type}
-                    </span>
+                  <div key={c.type} className={a.contactsItem}>
+                    <span className={a.contactType}>{CONTACT_LABELS[c.type] ?? c.type}</span>
                     {c.value}
                   </div>
                 ))}
@@ -120,15 +112,15 @@ export default async function AdminRequestDetailPage({ params }: Props) {
           />
         )}
         {mainSignedUrl && (
-          <Row label="메인 이미지" value={
-            <img src={mainSignedUrl} alt="메인" style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '2px', border: '1px solid rgba(12,12,12,0.1)', display: 'block' }} />
-          } />
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <Row label="메인 이미지" value={<img src={mainSignedUrl} alt="메인" className={a.mainImageThumb} />} />
         )}
         {additionalSignedUrls.filter(Boolean).length > 0 && (
           <Row label="추가 이미지" value={
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className={a.imageThumbList}>
               {additionalSignedUrls.filter(Boolean).map((url, i) => (
-                <img key={i} src={url!} alt={`추가 ${i + 1}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '2px', border: '1px solid rgba(12,12,12,0.1)' }} />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={i} src={url!} alt={`추가 ${i + 1}`} className={a.imageThumb} />
               ))}
             </div>
           } />
@@ -140,19 +132,12 @@ export default async function AdminRequestDetailPage({ params }: Props) {
 
       {/* 제작된 시안 — requestVariants에 있으면 전체 표시 */}
       {requestVariants[requestId] && (
-        <div style={{ marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '16px', letterSpacing: '-0.02em', margin: 0 }}>
-              제작된 시안
-            </h2>
+        <div className={a.variantSectionMb}>
+          <div className={a.variantSectionHeader}>
+            <h2 className={a.pageH2} style={{ margin: 0, marginBottom: 0 }}>제작된 시안</h2>
             {request.selectedTemplateId && status === 'template_selection' && (
               <form action={async () => { 'use server'; await resetTemplateChoice(requestId) }}>
-                <button
-                  type="submit"
-                  style={{ ...btnBase, fontSize: '12px', padding: '6px 14px', color: 'rgba(12,12,12,0.55)', borderColor: 'rgba(12,12,12,0.2)', background: 'transparent' }}
-                >
-                  선택 초기화
-                </button>
+                <button type="submit" className={a.btnReset}>선택 초기화</button>
               </form>
             )}
           </div>
@@ -171,56 +156,48 @@ export default async function AdminRequestDetailPage({ params }: Props) {
       )}
 
       {/* 액션 패널 */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div className={a.actionPanel}>
         {status === 'pending' && (
           <form action={async () => { 'use server'; await setTemplateSelection(requestId) }}>
-            <button type="submit" style={{ ...btnBase, background: '#0C0C0C', color: '#fff', borderColor: '#0C0C0C' }}>
-              템플릿 선택 요청
-            </button>
+            <button type="submit" className={a.btnPrimary}>템플릿 선택 요청</button>
           </form>
         )}
 
         {status === 'template_selection' && request.selectedTemplateId && (
           <form action={markDone.bind(null, requestId)}>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div className={a.publishForm}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', color: 'rgba(12,12,12,0.5)', marginBottom: '4px' }}>username</label>
+                <label className={a.publishLabel}>username</label>
                 <input
                   name="username"
                   required
                   defaultValue={slugify(request.requesterName ?? request.brandName)}
                   placeholder="예: johndoe"
-                  style={{ padding: '8px 12px', border: '1px solid rgba(12,12,12,0.2)', fontSize: '14px', width: '160px', fontFamily: 'inherit' }}
+                  className={a.publishInput}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', color: 'rgba(12,12,12,0.5)', marginBottom: '4px' }}>slug</label>
+                <label className={a.publishLabel}>slug</label>
                 <input
                   name="slug"
                   required
                   defaultValue="portfolio"
                   placeholder="예: portfolio"
-                  style={{ padding: '8px 12px', border: '1px solid rgba(12,12,12,0.2)', fontSize: '14px', width: '160px', fontFamily: 'inherit' }}
+                  className={a.publishInput}
                 />
               </div>
-              <button type="submit" style={{ ...btnBase, background: '#065F46', color: '#fff', borderColor: '#065F46' }}>
-                제작 완료
-              </button>
+              <button type="submit" className={a.btnSuccess}>제작 완료</button>
             </div>
           </form>
         )}
 
         {status === 'template_selection' && !request.selectedTemplateId && (
-          <p style={{ fontSize: '13px', color: 'rgba(12,12,12,0.45)', padding: '10px 0' }}>
-            유저가 템플릿을 선택하면 제작 완료 버튼이 나타납니다
-          </p>
+          <p className={a.statusNote}>유저가 템플릿을 선택하면 제작 완료 버튼이 나타납니다</p>
         )}
 
         {status !== 'cancelled' && status !== 'done' && (
           <form action={async () => { 'use server'; await adminCancelRequest(requestId) }}>
-            <button type="submit" style={{ ...btnBase, background: 'transparent', color: '#DC2626', borderColor: 'rgba(220,38,38,0.4)' }}>
-              요청 취소
-            </button>
+            <button type="submit" className={a.btnDanger}>요청 취소</button>
           </form>
         )}
       </div>
@@ -230,9 +207,9 @@ export default async function AdminRequestDetailPage({ params }: Props) {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: '16px', padding: '14px 20px', borderBottom: '1px solid rgba(12,12,12,0.06)', fontSize: '14px' }}>
-      <span style={{ color: 'rgba(12,12,12,0.45)', fontWeight: 500, paddingTop: '1px' }}>{label}</span>
-      <span style={{ color: '#0C0C0C', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{value}</span>
+    <div className={a.infoRow}>
+      <span className={a.infoRowLabel}>{label}</span>
+      <span className={a.infoRowValue}>{value}</span>
     </div>
   )
 }
