@@ -20,6 +20,7 @@ export const portfolioRequests = pgTable(
     imageUrls: text('image_urls').array().default([]),
     contacts: jsonb('contacts').$type<{ type: string; value: string }[]>().default([]),
     selectedTemplateId: text('selected_template_id'),
+    requesterName: text('requester_name'),
     additionalRequest: text('additional_request'),
     infoRequestMessage: text('info_request_message'),
     infoRequestedAt: timestamp('info_requested_at'),

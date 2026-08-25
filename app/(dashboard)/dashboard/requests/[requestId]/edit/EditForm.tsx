@@ -43,6 +43,7 @@ async function supabaseUpload(signedUrl: string, file: File) {
 
 const schema = z.object({
   brandName: z.string().min(1, '브랜드명 또는 이름을 입력하세요'),
+  requesterName: z.string().min(1, '활동명 또는 이름을 입력하세요'),
   websiteType: z.string().min(1, '홈페이지 유형을 선택하세요'),
   brandDescription: z.string().min(1, '브랜드 또는 본인 소개를 입력하세요'),
   additionalRequest: z.string().optional(),
@@ -54,6 +55,7 @@ interface Props {
   requestId: string
   initial: {
     brandName: string
+    requesterName: string | null
     websiteType: string
     brandDescription: string
     additionalRequest: string | null
@@ -80,6 +82,7 @@ export default function EditForm({ requestId, initial }: Props) {
     resolver: zodResolver(schema),
     defaultValues: {
       brandName: initial.brandName,
+      requesterName: initial.requesterName ?? '',
       websiteType: initial.websiteType,
       brandDescription: initial.brandDescription,
       additionalRequest: initial.additionalRequest ?? '',
@@ -126,6 +129,7 @@ export default function EditForm({ requestId, initial }: Props) {
 
       const formData = new FormData()
       formData.set('brandName', values.brandName)
+      formData.set('requesterName', values.requesterName)
       formData.set('websiteType', values.websiteType)
       formData.set('brandDescription', values.brandDescription)
       if (values.additionalRequest) formData.set('additionalRequest', values.additionalRequest)
@@ -145,6 +149,13 @@ export default function EditForm({ requestId, initial }: Props) {
         <label className={s.label} htmlFor="brandName">브랜드명 또는 이름<span className={s.requiredMark}>필수</span></label>
         <input id="brandName" className={s.input} {...register('brandName')} />
         {errors.brandName && <p className={s.errorText}>{errors.brandName.message}</p>}
+      </div>
+
+      {/* 활동명 또는 이름 */}
+      <div className={s.field}>
+        <label className={s.label} htmlFor="requesterName">활동명 또는 이름<span className={s.requiredMark}>필수</span></label>
+        <input id="requesterName" className={s.input} {...register('requesterName')} placeholder="예: zoeyoon, 조이윤 (URL 주소에 사용됩니다)" />
+        {errors.requesterName && <p className={s.errorText}>{errors.requesterName.message}</p>}
       </div>
 
       {/* 홈페이지 유형 */}

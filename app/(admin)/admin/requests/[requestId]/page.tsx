@@ -10,6 +10,7 @@ import AdminVariantPreviewer from '@/components/AdminVariantPreviewer'
 import AdminStatusChanger from './AdminStatusChanger'
 import AdminInfoRequester from './AdminInfoRequester'
 import { requestVariants } from '@/lib/templates/index'
+import { slugify } from '@/lib/utils/slugify'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
   pending:            { label: '요청중',     className: s.badgePending },
@@ -187,6 +188,7 @@ export default async function AdminRequestDetailPage({ params }: Props) {
                 <input
                   name="username"
                   required
+                  defaultValue={slugify(request.requesterName ?? request.brandName)}
                   placeholder="예: johndoe"
                   style={{ padding: '8px 12px', border: '1px solid rgba(12,12,12,0.2)', fontSize: '14px', width: '160px', fontFamily: 'inherit' }}
                 />
@@ -196,7 +198,8 @@ export default async function AdminRequestDetailPage({ params }: Props) {
                 <input
                   name="slug"
                   required
-                  placeholder="예: my-brand"
+                  defaultValue="portfolio"
+                  placeholder="예: portfolio"
                   style={{ padding: '8px 12px', border: '1px solid rgba(12,12,12,0.2)', fontSize: '14px', width: '160px', fontFamily: 'inherit' }}
                 />
               </div>
