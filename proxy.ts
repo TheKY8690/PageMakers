@@ -10,7 +10,7 @@ export const config = {
   ],
 }
 
-export default async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const hostname = request.headers.get('host') ?? ''
   const { pathname } = request.nextUrl
   const BASE = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? 'pagemaker.store'
