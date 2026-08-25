@@ -16,7 +16,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    images: ['/og-image.png'],
+    images: ['/og-image-gold.png'],
+  },
+  icons: {
+    icon: [{ url: '/골드파비콘.png', type: 'image/png' }],
+    shortcut: '/골드파비콘.png',
   },
 };
 
