@@ -73,7 +73,7 @@ export default async function DashboardPage() {
                   {page.brandName ?? '-'}
                 </p>
                 <p style={{ fontSize: '12px', color: 'rgba(12,12,12,0.4)', margin: '0 0 16px', fontFamily: 'monospace' }}>
-                  {page.username}.pagemakers.co
+                  {page.slug}.pagemakers.co
                 </p>
                 <p style={{ fontSize: '12px', color: '#0C0C0C', fontWeight: 600, margin: 0, letterSpacing: '0.02em' }}>
                   페이지 보기 →

@@ -26,7 +26,7 @@ export async function proxy(request: NextRequest) {
       const [page] = await db
         .select({ username: publishedPages.username, slug: publishedPages.slug })
         .from(publishedPages)
-        .where(eq(publishedPages.username, sub))
+        .where(eq(publishedPages.slug, sub))
         .limit(1)
 
       if (!page) {
