@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { TemplateProps } from '@/lib/templates/types'
 import PagePreloader from './PagePreloader'
+import ExpandableGallery from '@/components/ui/ExpandableGallery'
 import * as s from '@/styles/requests/4f307aca/v3.css'
 
 const VARIANT_ID = '4f307aca-v3'
@@ -25,8 +26,6 @@ export default function Variant3({
   isPreview = false,
 }: TemplateProps) {
   const [preloaderDone, setPreloaderDone] = useState(isPreview)
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const accent = brandColors[0] ?? '#C8A96E'
 
@@ -170,50 +169,9 @@ export default function Variant3({
           5. EXPANDABLE GALLERY
       ════════════════════════════════════════════════════════ */}
       {galleryImgs.length > 0 && (
-        <section id="v3-works" className={`${s.galleryTrack} ${s.reveal}`}>
-          {galleryImgs.map((url, i) => (
-            <div
-              key={i}
-              className={`${s.galleryItem} ${
-                hoveredIdx === i ? s.galleryItemActive
-                : hoveredIdx !== null ? s.galleryItemDim
-                : ''
-              }`}
-              onMouseEnter={() => setHoveredIdx(i)}
-              onMouseLeave={() => setHoveredIdx(null)}
-              onClick={() => setLightboxIdx(i)}
-            >
-              <img className={s.galleryImg} src={url} alt={`${brandName} ${i + 1}`} />
-              <div className={s.galleryOverlay} />
-              <span className={s.galleryNum}>{String(i + 1).padStart(2, '0')}</span>
-            </div>
-          ))}
+        <section id="v3-works" className={s.reveal}>
+          <ExpandableGallery images={galleryImgs} altPrefix={brandName} />
         </section>
-      )}
-
-      {lightboxIdx !== null && (
-        <div className={s.lightboxOverlay} onClick={() => setLightboxIdx(null)}>
-          <img
-            className={s.lightboxImg}
-            src={galleryImgs[lightboxIdx]}
-            alt={`${brandName} ${lightboxIdx + 1}`}
-            onClick={e => e.stopPropagation()}
-          />
-          <button className={s.lightboxClose} onClick={() => setLightboxIdx(null)}>×</button>
-          {galleryImgs.length > 1 && (
-            <>
-              <button
-                className={s.lightboxPrev}
-                onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galleryImgs.length) % galleryImgs.length) }}
-              >‹</button>
-              <button
-                className={s.lightboxNext}
-                onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galleryImgs.length) }}
-              >›</button>
-            </>
-          )}
-          <span className={s.lightboxCounter}>{lightboxIdx + 1} / {galleryImgs.length}</span>
-        </div>
       )}
 
       {/* ════════════════════════════════════════════════════════
