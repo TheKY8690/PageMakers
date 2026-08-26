@@ -55,6 +55,7 @@ export async function updateRequest(requestId: string, formData: FormData) {
   if (!user) throw new Error('Unauthorized')
 
   const brandName = formData.get('brandName') as string
+  const requesterName = (formData.get('requesterName') as string) || null
   const websiteType = formData.get('websiteType') as string
   const brandDescription = formData.get('brandDescription') as string
   const brandColors = formData.getAll('brandColors') as string[]
@@ -68,6 +69,7 @@ export async function updateRequest(requestId: string, formData: FormData) {
     .update(portfolioRequests)
     .set({
       brandName,
+      requesterName,
       websiteType,
       brandDescription,
       brandColors,

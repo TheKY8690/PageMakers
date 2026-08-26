@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { portfolioRequests } from '@/lib/db/schema'
 import { eq, sql } from 'drizzle-orm'
 import * as s from '@/styles/dashboard/dashboard.css'
+import * as a from '@/styles/admin/admin.css'
 
 export default async function AdminAnalyticsPage() {
   const { data: { users } } = await supabaseAdmin.auth.admin.listUsers()
@@ -33,26 +34,13 @@ export default async function AdminAnalyticsPage() {
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>분석</h1>
       </div>
-      <div style={{ padding: '32px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
+      <div className={a.pageInner}>
+        <div className={a.statGrid}>
           {stats.map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                border: '1px solid rgba(12,12,12,0.1)',
-                backgroundColor: '#fff',
-                padding: '24px 20px',
-              }}
-            >
-              <p style={{ margin: '0 0 8px', fontSize: '12px', color: 'rgba(12,12,12,0.45)', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                {stat.label}
-              </p>
-              <p style={{ margin: '0 0 4px', fontSize: '36px', fontWeight: 800, fontFamily: "'Archivo', system-ui, sans-serif", letterSpacing: '-0.04em', color: '#0C0C0C', lineHeight: 1 }}>
-                {stat.value}
-              </p>
-              <p style={{ margin: 0, fontSize: '12px', color: 'rgba(12,12,12,0.4)' }}>
-                {stat.desc}
-              </p>
+            <div key={stat.label} className={a.statCard}>
+              <p className={a.statLabel}>{stat.label}</p>
+              <p className={a.statValue}>{stat.value}</p>
+              <p className={a.statDesc}>{stat.desc}</p>
             </div>
           ))}
         </div>
