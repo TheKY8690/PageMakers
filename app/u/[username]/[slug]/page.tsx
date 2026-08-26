@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { db } from '@/lib/db'
-import { publishedPages, portfolioRequests } from '@/lib/db/schema'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { eq, and } from 'drizzle-orm'
 import { findVariantComponent } from '@/lib/templates/index'
 
 export const revalidate = 3600
@@ -12,26 +9,69 @@ interface Props {
   params: Promise<{ username: string; slug: string }>
 }
 
+type PublishedPageRow = {
+  id: string
+  request_id: string
+  template_id: string
+  user_id: string | null
+  username: string
+  slug: string
+}
+
+type PortfolioRequestRow = {
+  brand_name: string
+  brand_description: string
+  website_type: string | null
+  brand_colors: string[] | null
+  main_image_url: string | null
+  image_urls: string[] | null
+  contacts: { type: string; value: string }[] | null
+  additional_request: string | null
+}
+
 async function getPageData(username: string, slug: string) {
-  const [page] = await db
-    .select()
-    .from(publishedPages)
-    .where(and(eq(publishedPages.username, username), eq(publishedPages.slug, slug)))
+  const { data: pageRaw } = (await supabaseAdmin
+    .from('published_pages')
+    .select('id, request_id, template_id, user_id, username, slug')
+    .eq('username', username)
+    .eq('slug', slug)
+    .single()) as unknown as { data: PublishedPageRow | null }
 
-  if (!page) return null
+  if (!pageRaw) return null
 
-  const [request] = await db
-    .select()
-    .from(portfolioRequests)
-    .where(eq(portfolioRequests.id, page.requestId))
+  const { data: raw } = (await supabaseAdmin
+    .from('portfolio_requests')
+    .select('brand_name, brand_description, website_type, brand_colors, main_image_url, image_urls, contacts, additional_request')
+    .eq('id', pageRaw.request_id)
+    .single()) as unknown as { data: PortfolioRequestRow | null }
 
-  if (!request) return null
+  if (!raw) return null
 
-  return { page, request }
+  return {
+    page: {
+      id: pageRaw.id as string,
+      requestId: pageRaw.request_id as string,
+      templateId: pageRaw.template_id as string,
+      userId: pageRaw.user_id as string | null,
+      username: pageRaw.username as string,
+      slug: pageRaw.slug as string,
+    },
+    request: {
+      brandName: raw.brand_name as string,
+      brandDescription: raw.brand_description as string,
+      websiteType: raw.website_type as string | null,
+      brandColors: (raw.brand_colors ?? []) as string[],
+      mainImageUrl: raw.main_image_url as string | null,
+      imageUrls: (raw.image_urls ?? []) as string[],
+      contacts: (raw.contacts ?? []) as { type: string; value: string }[],
+      additionalRequest: raw.additional_request as string | null,
+    },
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { username, slug } = await params
+  const { username: rawUsername, slug } = await params
+  const username = decodeURIComponent(rawUsername)
   const data = await getPageData(username, slug)
   if (!data) return { title: 'Not Found' }
 
@@ -43,7 +83,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (request.mainImageUrl) {
     const { data: signedData } = await supabaseAdmin.storage
       .from('sendMe-images')
-      .createSignedUrl(request.mainImageUrl, 3600)
+      .createSignedUrl(request.mainImageUrl, 31536000)
     ogImageUrl = signedData?.signedUrl
   }
 
@@ -63,13 +103,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...(ogImageUrl ? { images: [ogImageUrl] } : {}),
     },
     alternates: {
-      canonical: `/u/${username}/${slug}`,
+      canonical: `https://${slug}.pagemaker.store`,
     },
   }
 }
 
 export default async function PortfolioPage({ params }: Props) {
-  const { username, slug } = await params
+  const { username: rawUsername, slug } = await params
+  const username = decodeURIComponent(rawUsername)
   const data = await getPageData(username, slug)
   if (!data) notFound()
 
@@ -80,13 +121,13 @@ export default async function PortfolioPage({ params }: Props) {
 
   // Signed URLs — mainImage
   const mainImageUrl = request.mainImageUrl
-    ? (await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(request.mainImageUrl, 3600)).data?.signedUrl ?? null
+    ? (await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(request.mainImageUrl, 31536000)).data?.signedUrl ?? null
     : null
 
   // Signed URLs — gallery images
   const imageUrls = await Promise.all(
     (request.imageUrls ?? []).map(async (path: string) => {
-      const { data } = await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(path, 3600)
+      const { data } = await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(path, 31536000)
       return data?.signedUrl ?? null
     })
   ).then(urls => urls.filter(Boolean) as string[])
@@ -109,7 +150,7 @@ export default async function PortfolioPage({ params }: Props) {
         name: `${request.brandName} | ${request.websiteType ?? 'Portfolio'}`,
         description: request.brandDescription.replace(/\r?\n/g, ' ').slice(0, 160),
         mainEntity: { '@type': 'Person', name: request.brandName },
-        url: `https://pagemakers.co/u/${username}/${slug}`,
+        url: `https://${slug}.pagemaker.store`,
       },
     ],
   }
@@ -128,7 +169,7 @@ export default async function PortfolioPage({ params }: Props) {
         imageUrls={imageUrls}
         mainImageUrl={mainImageUrl}
         contacts={contacts}
-        websiteType={request.websiteType}
+        websiteType={request.websiteType ?? undefined}
       />
     </>
   )

@@ -44,6 +44,7 @@ const WEBSITE_TYPES = [
 
 const schema = z.object({
   brandName: z.string().min(1, '브랜드명 또는 이름을 입력하세요'),
+  requesterName: z.string().min(1, '활동명 또는 이름을 입력하세요'),
   websiteType: z.string().min(1, '홈페이지 유형을 선택하세요'),
   brandDescription: z.string().min(1, '브랜드 또는 본인 소개를 입력하세요'),
   additionalRequest: z.string().optional(),
@@ -135,6 +136,7 @@ export default function RequestForm() {
 
       const formData = new FormData()
       formData.set('brandName', values.brandName)
+      formData.set('requesterName', values.requesterName)
       formData.set('websiteType', values.websiteType)
       formData.set('brandDescription', values.brandDescription)
       if (values.additionalRequest) formData.set('additionalRequest', values.additionalRequest)
@@ -152,15 +154,29 @@ export default function RequestForm() {
       {/* 브랜드명 또는 이름 */}
       <div className={s.field}>
         <label className={s.label} htmlFor="brandName">
-          브랜드명 또는 이름<span className={s.requiredMark}>필수</span>
+          브랜드명<span className={s.requiredMark}>필수</span>
         </label>
         <input
           id="brandName"
           className={s.input}
           {...register('brandName')}
-          placeholder="브랜드명 또는 이름"
+          placeholder="브랜드명 (URL에 사용됩니다)"
         />
         {errors.brandName && <p className={s.errorText}>{errors.brandName.message}</p>}
+      </div>
+
+      {/* 활동명 또는 이름 */}
+      <div className={s.field}>
+        <label className={s.label} htmlFor="requesterName">
+          요청자 이름<span className={s.requiredMark}>필수</span>
+        </label>
+        <input
+          id="requesterName"
+          className={s.input}
+          {...register('requesterName')}
+          placeholder="요청자 이름"
+        />
+        {errors.requesterName && <p className={s.errorText}>{errors.requesterName.message}</p>}
       </div>
 
       {/* 홈페이지 유형 */}
@@ -203,7 +219,7 @@ export default function RequestForm() {
           id="brandDescription"
           className={s.textarea}
           {...register('brandDescription')}
-          placeholder={`좌우명:\n소개글:\n어필하고 싶은 이력:`}
+          placeholder={`좌우명:\n소개글:\n어필하고 싶은 이력:\n브랜드의 히스토리:`}
         />
         {errors.brandDescription && <p className={s.errorText}>{errors.brandDescription.message}</p>}
       </div>
@@ -211,7 +227,7 @@ export default function RequestForm() {
       {/* 대표 컬러 */}
       <div className={s.field}>
         <span className={s.label}>
-          대표 컬러 (최대 3개)<span className={s.requiredMark}>필수</span>
+          대표 컬러 (이 컬러를 기준으로 제작됩니다 / 최대 3개 )<span className={s.requiredMark}>필수</span>
         </span>
         <div className={s.colorList}>
           {brandColors.map((color, index) => (
@@ -256,7 +272,7 @@ export default function RequestForm() {
       {/* 메인 이미지 */}
       <div className={s.field}>
         <label className={s.label} htmlFor="mainImage">
-          메인 이미지<span className={s.optionalMark}>선택</span>
+          대표 이미지<span className={s.optionalMark}>선택</span>
         </label>
         {!mainImage ? (
           <label className={s.fileLabel} htmlFor="mainImage">

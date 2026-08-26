@@ -78,12 +78,22 @@ export default async function RequestDetailPage({ params }: Props) {
         <span className={badge.className}>{badge.label}</span>
       </div>
 
-      {/* 추가 자료 요청 배너 */}
+      {/* 추가 자료 요청 배너 (admin 요청) */}
       {request.infoRequestMessage && (
         <AdditionalInfoForm
           requestId={requestId}
           message={request.infoRequestMessage}
           requestedAt={request.infoRequestedAt ?? null}
+        />
+      )}
+
+      {/* 추가 자료 보내기 (유저 자발적) */}
+      {!request.infoRequestMessage && status !== 'done' && status !== 'cancelled' && (
+        <AdditionalInfoForm
+          requestId={requestId}
+          message=""
+          requestedAt={null}
+          isProactive
         />
       )}
 

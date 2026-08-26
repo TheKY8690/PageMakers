@@ -20,6 +20,7 @@ export const portfolioRequests = pgTable(
     imageUrls: text('image_urls').array().default([]),
     contacts: jsonb('contacts').$type<{ type: string; value: string }[]>().default([]),
     selectedTemplateId: text('selected_template_id'),
+    requesterName: text('requester_name'),
     additionalRequest: text('additional_request'),
     infoRequestMessage: text('info_request_message'),
     infoRequestedAt: timestamp('info_requested_at'),
@@ -33,6 +34,12 @@ export const portfolioRequests = pgTable(
       for: 'all',
       to: 'authenticated',
       using: sql`auth.uid() = ${table.userId}`,
+    }),
+    pgPolicy('public_read_published_requests', {
+      as: 'permissive',
+      for: 'select',
+      to: 'anon,authenticated',
+      using: sql`id IN (SELECT request_id FROM published_pages)`,
     }),
   ]
 ).enableRLS()

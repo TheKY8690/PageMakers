@@ -7,16 +7,41 @@ interface Props {
   requestId: string
   message: string
   requestedAt: Date | null
+  isProactive?: boolean
 }
 
-export default function AdditionalInfoForm({ requestId, message, requestedAt }: Props) {
+export default function AdditionalInfoForm({ requestId, message, requestedAt, isProactive }: Props) {
   const [text, setText] = useState('')
   const [files, setFiles] = useState<File[]>([])
   const [isPending, startTransition] = useTransition()
   const [done, setDone] = useState(false)
+  const [open, setOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   if (done) return null
+
+  if (isProactive && !open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{
+          display: 'block',
+          padding: '8px 16px',
+          border: '1px solid rgba(12,12,12,0.15)',
+          background: 'transparent',
+          fontSize: '13px',
+          color: 'rgba(12,12,12,0.6)',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          borderRadius: '2px',
+          marginBottom: '24px',
+        }}
+      >
+        + 추가 자료 보내기
+      </button>
+    )
+  }
 
   const handleSubmit = () => {
     startTransition(async () => {
@@ -42,32 +67,57 @@ export default function AdditionalInfoForm({ requestId, message, requestedAt }: 
 
   return (
     <div style={{
-      border: '1px solid rgba(234,88,12,0.3)',
-      background: '#FFF7ED',
+      border: isProactive ? '1px solid rgba(12,12,12,0.1)' : '1px solid rgba(234,88,12,0.3)',
+      background: isProactive ? '#FAFAFA' : '#FFF7ED',
       borderRadius: '2px',
       padding: '20px 24px',
       marginBottom: '24px',
     }}>
       {/* 헤더 */}
       <div style={{ marginBottom: '16px' }}>
-        <p style={{
-          fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: 'rgba(234,88,12,0.8)', margin: '0 0 8px', fontWeight: 700,
-        }}>
-          📌 제작팀 메시지
-          {requestedAt && (
-            <span style={{ marginLeft: '8px', fontWeight: 400, letterSpacing: 0, textTransform: 'none', color: 'rgba(12,12,12,0.35)' }}>
-              {new Date(requestedAt).toLocaleString('ko-KR')}
-            </span>
-          )}
-        </p>
-        <p style={{ fontSize: '15px', color: '#0C0C0C', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontWeight: 500 }}>
-          {message}
-        </p>
+        {isProactive ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0C0C0C', margin: '0 0 4px' }}>
+                추가 자료 보내기
+              </p>
+              <p style={{ fontSize: '13px', color: 'rgba(12,12,12,0.45)', margin: 0 }}>
+                제작 완료 전까지 추가 이미지나 내용을 보낼 수 있습니다
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: '18px', color: 'rgba(12,12,12,0.35)', padding: '0 0 0 12px', lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <>
+            <p style={{
+              fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase',
+              color: 'rgba(234,88,12,0.8)', margin: '0 0 8px', fontWeight: 700,
+            }}>
+              📌 제작팀 메시지
+              {requestedAt && (
+                <span style={{ marginLeft: '8px', fontWeight: 400, letterSpacing: 0, textTransform: 'none', color: 'rgba(12,12,12,0.35)' }}>
+                  {new Date(requestedAt).toLocaleString('ko-KR')}
+                </span>
+              )}
+            </p>
+            <p style={{ fontSize: '15px', color: '#0C0C0C', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontWeight: 500 }}>
+              {message}
+            </p>
+          </>
+        )}
       </div>
 
       {/* 구분선 */}
-      <div style={{ borderTop: '1px solid rgba(234,88,12,0.15)', marginBottom: '16px' }} />
+      <div style={{ borderTop: isProactive ? '1px solid rgba(12,12,12,0.08)' : '1px solid rgba(234,88,12,0.15)', marginBottom: '16px' }} />
 
       {/* 텍스트 입력 */}
       <div style={{ marginBottom: '12px' }}>

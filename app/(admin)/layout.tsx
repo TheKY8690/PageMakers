@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { profiles } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import * as s from '@/styles/dashboard/layout.css'
+import * as a from '@/styles/admin/admin.css'
 import AdminNavLink from './AdminNavLink'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -35,21 +36,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <AdminNavLink href="/admin/analytics">분석</AdminNavLink>
           <AdminNavLink href="/admin/portfolios">포트폴리오</AdminNavLink>
         </nav>
-        <form action={signOut} style={{ marginTop: 'auto' }}>
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '10px 16px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '13px',
-              color: 'rgba(12,12,12,0.4)',
-              textAlign: 'left',
-              fontFamily: 'inherit',
-            }}
-          >
+        <form action={signOut} className={a.signOutForm}>
+          <button type="submit" className={a.signOutBtn}>
             로그아웃
           </button>
         </form>
