@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: pages } = (await supabaseAdmin
     .from('published_pages')
