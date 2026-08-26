@@ -1,9 +1,7 @@
-import { db } from '@/lib/db'
-import { publishedPages, portfolioRequests } from '@/lib/db/schema'
-import { eq, and } from 'drizzle-orm'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { templateRegistry } from '@/lib/templates/index'
-import type { TemplateId } from '@/lib/templates/types'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { findVariantComponent } from '@/lib/templates/index'
 
 export const revalidate = 3600
 
@@ -11,34 +9,168 @@ interface Props {
   params: Promise<{ username: string; slug: string }>
 }
 
+type PublishedPageRow = {
+  id: string
+  request_id: string
+  template_id: string
+  user_id: string | null
+  username: string
+  slug: string
+}
+
+type PortfolioRequestRow = {
+  brand_name: string
+  brand_description: string
+  website_type: string | null
+  brand_colors: string[] | null
+  main_image_url: string | null
+  image_urls: string[] | null
+  contacts: { type: string; value: string }[] | null
+  additional_request: string | null
+}
+
+async function getPageData(username: string, slug: string) {
+  const { data: pageRaw } = (await supabaseAdmin
+    .from('published_pages')
+    .select('id, request_id, template_id, user_id, username, slug')
+    .eq('username', username)
+    .eq('slug', slug)
+    .single()) as unknown as { data: PublishedPageRow | null }
+
+  if (!pageRaw) return null
+
+  const { data: raw } = (await supabaseAdmin
+    .from('portfolio_requests')
+    .select('brand_name, brand_description, website_type, brand_colors, main_image_url, image_urls, contacts, additional_request')
+    .eq('id', pageRaw.request_id)
+    .single()) as unknown as { data: PortfolioRequestRow | null }
+
+  if (!raw) return null
+
+  return {
+    page: {
+      id: pageRaw.id as string,
+      requestId: pageRaw.request_id as string,
+      templateId: pageRaw.template_id as string,
+      userId: pageRaw.user_id as string | null,
+      username: pageRaw.username as string,
+      slug: pageRaw.slug as string,
+    },
+    request: {
+      brandName: raw.brand_name as string,
+      brandDescription: raw.brand_description as string,
+      websiteType: raw.website_type as string | null,
+      brandColors: (raw.brand_colors ?? []) as string[],
+      mainImageUrl: raw.main_image_url as string | null,
+      imageUrls: (raw.image_urls ?? []) as string[],
+      contacts: (raw.contacts ?? []) as { type: string; value: string }[],
+      additionalRequest: raw.additional_request as string | null,
+    },
+  }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username: rawUsername, slug } = await params
+  const username = decodeURIComponent(rawUsername)
+  const data = await getPageData(username, slug)
+  if (!data) return { title: 'Not Found' }
+
+  const { request } = data
+  const descriptionPlain = request.brandDescription.replace(/\r?\n/g, ' ').slice(0, 160)
+
+  // Main image OG
+  let ogImageUrl: string | undefined
+  if (request.mainImageUrl) {
+    const { data: signedData } = await supabaseAdmin.storage
+      .from('sendMe-images')
+      .createSignedUrl(request.mainImageUrl, 31536000)
+    ogImageUrl = signedData?.signedUrl
+  }
+
+  return {
+    title: `${request.brandName} | ${request.websiteType ?? 'Portfolio'}`,
+    description: descriptionPlain,
+    openGraph: {
+      title: request.brandName,
+      description: descriptionPlain,
+      type: 'profile',
+      ...(ogImageUrl ? { images: [{ url: ogImageUrl, width: 1200, height: 630, alt: request.brandName }] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: request.brandName,
+      description: descriptionPlain,
+      ...(ogImageUrl ? { images: [ogImageUrl] } : {}),
+    },
+    alternates: {
+      canonical: `https://${slug}.pagemaker.store`,
+    },
+  }
+}
+
 export default async function PortfolioPage({ params }: Props) {
-  const { username, slug } = await params
+  const { username: rawUsername, slug } = await params
+  const username = decodeURIComponent(rawUsername)
+  const data = await getPageData(username, slug)
+  if (!data) notFound()
 
-  const [page] = await db
-    .select()
-    .from(publishedPages)
-    .where(and(eq(publishedPages.username, username), eq(publishedPages.slug, slug)))
+  const { page, request } = data
 
-  if (!page) notFound()
+  const Template = findVariantComponent(page.templateId)
+  if (!Template) notFound()
 
-  const [request] = await db
-    .select()
-    .from(portfolioRequests)
-    .where(eq(portfolioRequests.id, page.requestId))
+  // Signed URLs — mainImage
+  const mainImageUrl = request.mainImageUrl
+    ? (await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(request.mainImageUrl, 31536000)).data?.signedUrl ?? null
+    : null
 
-  if (!request) notFound()
+  // Signed URLs — gallery images
+  const imageUrls = await Promise.all(
+    (request.imageUrls ?? []).map(async (path: string) => {
+      const { data } = await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(path, 31536000)
+      return data?.signedUrl ?? null
+    })
+  ).then(urls => urls.filter(Boolean) as string[])
 
-  const entry = templateRegistry[page.templateId as TemplateId]
-  if (!entry) notFound()
+  const contacts = (request.contacts as { type: string; value: string }[] | null) ?? []
 
-  const Template = entry.component
+  // JSON-LD
+  const instagramContact = contacts.find(c => c.type === 'instagram')
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Person',
+        name: request.brandName,
+        description: request.brandDescription.replace(/\r?\n/g, ' '),
+        ...(instagramContact ? { sameAs: [`https://instagram.com/${instagramContact.value.replace('@', '')}`] } : {}),
+      },
+      {
+        '@type': 'ProfilePage',
+        name: `${request.brandName} | ${request.websiteType ?? 'Portfolio'}`,
+        description: request.brandDescription.replace(/\r?\n/g, ' ').slice(0, 160),
+        mainEntity: { '@type': 'Person', name: request.brandName },
+        url: `https://${slug}.pagemaker.store`,
+      },
+    ],
+  }
 
   return (
-    <Template
-      brandName={request.brandName}
-      brandDescription={request.brandDescription}
-      brandColors={request.brandColors ?? []}
-      imageUrls={request.imageUrls ?? []}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {/* eslint-disable-next-line react-hooks/static-components */}
+      <Template
+        brandName={request.brandName}
+        brandDescription={request.brandDescription}
+        brandColors={request.brandColors ?? []}
+        imageUrls={imageUrls}
+        mainImageUrl={mainImageUrl}
+        contacts={contacts}
+        websiteType={request.websiteType ?? undefined}
+      />
+    </>
   )
 }

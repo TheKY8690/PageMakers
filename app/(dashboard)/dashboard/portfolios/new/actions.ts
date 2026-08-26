@@ -34,6 +34,7 @@ export async function createPortfolioRequest(formData: FormData) {
   } = await supabase.auth.getUser()
 
   const brandName = formData.get('brandName') as string
+  const requesterName = (formData.get('requesterName') as string) || null
   const websiteType = formData.get('websiteType') as string
   const brandDescription = formData.get('brandDescription') as string
   const brandColors = formData.getAll('brandColors') as string[]
@@ -48,6 +49,7 @@ export async function createPortfolioRequest(formData: FormData) {
     .values({
       userId: user?.id ?? null,
       brandName,
+      requesterName,
       websiteType,
       brandDescription,
       brandColors,

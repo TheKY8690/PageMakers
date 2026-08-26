@@ -1,3 +1,5 @@
-export default function AdminDashboardPage() {
-  return <main>어드민 대시보드</main>;
+import { redirect } from 'next/navigation'
+
+export default function AdminPage() {
+  redirect('/admin/requests')
 }

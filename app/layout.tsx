@@ -1,8 +1,27 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "PageMakers",
-  description: "개인/기업 포트폴리오 제작 서비스",
+  title: {
+    default: 'PageMakers — 나만의 포트폴리오 페이지',
+    template: '%s | PageMakers',
+  },
+  description:
+    '요청서 하나로, 전문가가 직접 만들어드리는 맞춤형 포트폴리오 페이지. 브랜드 컬러, 소개, 이미지를 담아 고유 URL로 즉시 공개됩니다.',
+  metadataBase: new URL('https://pagemaker.store'),
+  openGraph: {
+    type: 'website',
+    siteName: 'PageMakers',
+    locale: 'ko_KR',
+    images: [{ url: '/og-image.png', width: 1730, height: 909, alt: 'PageMakers' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/og-image-gold.png'],
+  },
+  icons: {
+    icon: [{ url: '/골드파비콘.png', type: 'image/png' }],
+    shortcut: '/골드파비콘.png',
+  },
 };
 
 export default function RootLayout({

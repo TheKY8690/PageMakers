@@ -49,6 +49,7 @@ export default async function EditRequestPage({ params }: Props) {
           requestId={requestId}
           initial={{
             brandName: request.brandName,
+            requesterName: request.requesterName ?? null,
             websiteType: request.websiteType,
             brandDescription: request.brandDescription,
             additionalRequest: request.additionalRequest ?? null,

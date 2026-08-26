@@ -5,15 +5,18 @@ import { portfolioRequests } from '@/lib/db/schema'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { and, eq } from 'drizzle-orm'
-import TemplatePicker from './preview/TemplatePicker'
 import { cancelRequest } from './actions'
+import TemplateSection from './TemplateSection'
+import AdditionalInfoForm from './AdditionalInfoForm'
 import * as s from '@/styles/dashboard/dashboard.css'
 
 const badgeMap: Record<string, { label: string; className: string }> = {
-  pending: { label: '대기중', className: s.badgePending },
-  cancelled: { label: '취소', className: s.badgeCancelled },
-  template_selection: { label: '선택요망', className: s.badgeTemplateSelection },
-  done: { label: '제작완료', className: s.badgeDone },
+  pending:            { label: '요청중',     className: s.badgePending },
+  waiting:            { label: '작업대기중', className: s.badgeWaiting },
+  in_progress:        { label: '작업중',     className: s.badgeInProgress },
+  template_selection: { label: '선택요망',   className: s.badgeTemplateSelection },
+  done:               { label: '제작완료',   className: s.badgeDone },
+  cancelled:          { label: '취소',       className: s.badgeCancelled },
 }
 
 const CONTACT_LABELS: Record<string, string> = {
@@ -74,6 +77,25 @@ export default async function RequestDetailPage({ params }: Props) {
         </h1>
         <span className={badge.className}>{badge.label}</span>
       </div>
+
+      {/* 추가 자료 요청 배너 (admin 요청) */}
+      {request.infoRequestMessage && (
+        <AdditionalInfoForm
+          requestId={requestId}
+          message={request.infoRequestMessage}
+          requestedAt={request.infoRequestedAt ?? null}
+        />
+      )}
+
+      {/* 추가 자료 보내기 (유저 자발적) */}
+      {!request.infoRequestMessage && status !== 'done' && status !== 'cancelled' && (
+        <AdditionalInfoForm
+          requestId={requestId}
+          message=""
+          requestedAt={null}
+          isProactive
+        />
+      )}
 
       {/* 상세 내용 */}
       <div style={{ border: '1px solid rgba(12,12,12,0.1)', backgroundColor: '#fff', marginBottom: '24px' }}>
@@ -193,24 +215,19 @@ export default async function RequestDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* 템플릿 선택 */}
-      {status === 'template_selection' && (
-        <div style={{ marginTop: '32px' }}>
-          <h2 style={{ fontFamily: "'Archivo', system-ui, sans-serif", fontWeight: 700, fontSize: '18px', letterSpacing: '-0.03em', marginBottom: '8px', color: '#0C0C0C' }}>
-            템플릿 선택
-          </h2>
-          <p style={{ fontSize: '14px', color: 'rgba(12,12,12,0.45)', marginBottom: '24px' }}>
-            브랜드에 어울리는 스타일을 골라주세요
-          </p>
-          <TemplatePicker
-            requestId={requestId}
-            brandName={request.brandName}
-            brandDescription={request.brandDescription}
-            brandColors={request.brandColors ?? []}
-            imageUrls={request.imageUrls ?? []}
-          />
-        </div>
-      )}
+      {/* 템플릿 선택 / 프리뷰 */}
+      <TemplateSection
+        requestId={requestId}
+        status={status}
+        selectedTemplateId={request.selectedTemplateId ?? null}
+        brandName={request.brandName}
+        brandDescription={request.brandDescription}
+        brandColors={request.brandColors ?? []}
+        imageUrls={additionalSignedUrls.filter(Boolean) as string[]}
+        mainImageUrl={mainSignedUrl}
+        contacts={contacts}
+        websiteType={request.websiteType}
+      />
     </div>
   )
 }
