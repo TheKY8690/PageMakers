@@ -36,7 +36,7 @@ export default function PagePreloader({
 
   const captionColor =
     theme === 'dark' ? 'rgba(255,255,255,0.45)'
-    : theme === 'light' ? 'rgba(0,0,0,0.4)'
+    : theme === 'light' ? accentColor
     : 'rgba(255,255,255,0.75)'
 
   const chars = descriptor.split('')
@@ -71,7 +71,7 @@ export default function PagePreloader({
     }, 400)
 
     // Phase 2 — 타이핑 완료 후 GSAP 시작
-    const gsapDelay = chars.length * 70 + 500
+    const gsapDelay = chars.length * 70 + 100
     let tl: gsap.core.Timeline | undefined
     let ctx: gsap.Context | undefined
 
@@ -207,7 +207,7 @@ export default function PagePreloader({
                 lineHeight: 1,
               }}
             >
-              {ch === ' ' ? '\u00A0' : ch}
+              {ch === ' ' ? '\u00A0' : ch.toUpperCase()}
             </span>
           ))}
         </div>
