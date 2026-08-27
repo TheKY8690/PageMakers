@@ -39,7 +39,6 @@ export default function Variant3({
   thumbImageUrls,
   mainImageUrl,
   contacts = [],
-  websiteType,
   isPreview = false,
 }: TemplateProps) {
   const [preloaderDone, setPreloaderDone] = useState(isPreview)
