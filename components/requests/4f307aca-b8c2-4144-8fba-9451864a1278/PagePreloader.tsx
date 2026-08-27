@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 
 // module-level — SPA 재방문 시 재생 방지 (hard reload에서 리셋됨)
@@ -24,6 +24,8 @@ export default function PagePreloader({
   onDone,
 }: PagePreloaderProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
+  const [typedCount, setTypedCount] = useState(0)
+  const [cursorVisible, setCursorVisible] = useState(true)
 
   const bgColor =
     theme === 'dark' ? '#0C0C0C'
@@ -37,8 +39,10 @@ export default function PagePreloader({
     : theme === 'light' ? 'rgba(0,0,0,0.4)'
     : 'rgba(255,255,255,0.75)'
 
+  const chars = descriptor.split('')
+
   useEffect(() => {
-    // SPA 재방문 시 즉시 완료 (shownSet은 애니메이션 완료 후 추가되므로 StrictMode에 안전)
+    // SPA 재방문 시 즉시 완료
     if (shownSet.has(variantId)) {
       onDone()
       return
@@ -50,67 +54,94 @@ export default function PagePreloader({
       return
     }
 
-    const overlay = overlayRef.current!
-    const tl = gsap.timeline()
+    // 새로고침 시 스크롤 상단 고정
+    window.scrollTo(0, 0)
 
-    // gsap.context로 셀렉터를 이 overlay 내부로 스코프 제한
-    // (AdminVariantPreviewer에서 3개 variant 동시 렌더링 시 충돌 방지)
-    const ctx = gsap.context(() => {
-      // Phase 1 — descriptor 등장
-      tl.to('[data-pp-caption]', {
-        opacity: 1,
-        y: 0,
-        duration: 0.65,
-        ease: 'power3.out',
-      })
+    // Phase 1 — 타이핑 (React state, 70ms/글자)
+    let count = 0
+    const typeInterval = setInterval(() => {
+      count++
+      setTypedCount(count)
+      if (count >= chars.length) clearInterval(typeInterval)
+    }, 70)
 
-      // Phase 1b — brandName 글자 stagger
-      tl.to('[data-pp-name]', {
-        opacity: 1,
-        y: 0,
-        duration: 0.75,
-        ease: 'power4.out',
-        stagger: 0.04,
-      }, '+=0.05')
+    // 커서 깜빡임
+    const blinkInterval = setInterval(() => {
+      setCursorVisible(v => !v)
+    }, 400)
 
-      // Phase 2 — 텍스트 exit
-      tl.to('[data-pp-text]', {
-        opacity: 0,
-        y: -18,
-        duration: 0.45,
-        ease: 'power2.in',
-      }, '+=0.7')
-    }, overlayRef)
+    // Phase 2 — 타이핑 완료 후 GSAP 시작
+    const gsapDelay = chars.length * 70 + 500
+    let tl: gsap.core.Timeline | undefined
+    let ctx: gsap.Context | undefined
 
-    // Phase 3 — Radial reveal (mask는 overlay 전체에 적용, ctx 밖)
-    tl.add(() => {
-      const target = Math.hypot(window.innerWidth, window.innerHeight)
-      const feather = 90
-      const dur = 900
-      const start = performance.now()
+    const gsapTimer = setTimeout(() => {
+      clearInterval(blinkInterval)
+      setCursorVisible(false)
 
-      const animate = (now: number) => {
-        const p = Math.min((now - start) / dur, 1)
-        const eased = 1 - Math.pow(1 - p, 3)
-        const r = eased * target
-        const grad = `radial-gradient(circle at 50% 50%, transparent ${r}px, ${bgColor} calc(${r}px + ${feather}px))`
-        overlay.style.maskImage = grad
-        ;(overlay.style as CSSStyleDeclaration & { webkitMaskImage: string }).webkitMaskImage = grad
-        if (p < 1) {
-          requestAnimationFrame(animate)
-        } else {
-          overlay.style.opacity = '0'
-          setTimeout(() => {
-            shownSet.add(variantId)  // 완료 후 추가 — StrictMode 2nd mount가 재실행해도 안전
-            onDone()
-          }, 300)
+      const overlay = overlayRef.current!
+      tl = gsap.timeline()
+      ctx = gsap.context(() => {
+        // 캡션 fade-out
+        tl!.to('[data-pp-caption]', {
+          opacity: 0,
+          y: -14,
+          duration: 0.4,
+          ease: 'power2.in',
+        })
+        // brandName 등장
+        tl!.to('[data-pp-name]', {
+          opacity: 1,
+          y: 0,
+          duration: 0.75,
+          ease: 'power4.out',
+          stagger: 0.04,
+        }, '-=0.05')
+        // brandName exit
+        tl!.to('[data-pp-brand]', {
+          opacity: 0,
+          y: -18,
+          duration: 0.45,
+          ease: 'power2.in',
+        }, '+=0.7')
+      }, overlayRef)
+
+      // Phase 3 — Radial reveal
+      tl.add(() => {
+        const target = Math.hypot(window.innerWidth, window.innerHeight)
+        const feather = 90
+        const dur = 900
+        const start = performance.now()
+
+        const animate = (now: number) => {
+          const p = Math.min((now - start) / dur, 1)
+          const eased = 1 - Math.pow(1 - p, 3)
+          const r = eased * target
+          const grad = `radial-gradient(circle at 50% 50%, transparent ${r}px, ${bgColor} calc(${r}px + ${feather}px))`
+          overlay.style.maskImage = grad
+          ;(overlay.style as CSSStyleDeclaration & { webkitMaskImage: string }).webkitMaskImage = grad
+          if (p < 1) {
+            requestAnimationFrame(animate)
+          } else {
+            overlay.style.opacity = '0'
+            setTimeout(() => {
+              shownSet.add(variantId)
+              onDone()
+            }, 300)
+          }
         }
-      }
-      requestAnimationFrame(animate)
-    }, '+=0.1')
+        requestAnimationFrame(animate)
+      }, '+=0.1')
+    }, gsapDelay)
 
-    return () => { tl.kill(); ctx.revert() }
-  }, [variantId, onDone, bgColor])
+    return () => {
+      clearInterval(typeInterval)
+      clearInterval(blinkInterval)
+      clearTimeout(gsapTimer)
+      tl?.kill()
+      ctx?.revert()
+    }
+  }, [variantId, onDone, bgColor, chars.length])
 
   const letters = brandName.split('')
 
@@ -126,58 +157,59 @@ export default function PagePreloader({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'opacity 0.3s ease',
+        willChange: 'mask-image, opacity',
+        transform: 'translateZ(0)',
         pointerEvents: 'none',
       }}
     >
-      <div data-pp-text style={{ textAlign: 'center', userSelect: 'none' }}>
-        {/* Descriptor caption */}
+      {/* Descriptor caption — 타이핑 커서 실시간 이동 */}
+      <div data-pp-caption style={{ textAlign: 'center', userSelect: 'none', marginBottom: '22px' }}>
         <p
-          data-pp-caption
           style={{
-            opacity: 0,
-            transform: 'translateY(14px)',
-            fontSize: '10px',
-            letterSpacing: '0.32em',
+            fontSize: 'clamp(16px, 2.5vw, 28px)',
+            letterSpacing: '0.2em',
             textTransform: 'uppercase',
             color: captionColor,
-            marginBottom: '22px',
+            margin: 0,
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 400,
           }}
         >
-          {descriptor}
+          {chars.slice(0, typedCount).map((ch, i) => (
+            <span key={i}>{ch === ' ' ? '\u00A0' : ch}</span>
+          ))}
+          <span style={{ opacity: cursorVisible ? 1 : 0 }}>|</span>
         </p>
+      </div>
 
-        {/* Brand name — letter stagger */}
-        <div style={{ overflow: 'hidden', paddingBottom: '4px' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'baseline',
-            }}
-          >
-            {letters.map((ch, i) => (
-              <span
-                key={i}
-                data-pp-name
-                style={{
-                  display: 'inline-block',
-                  opacity: 0,
-                  transform: 'translateY(42px)',
-                  fontSize: 'clamp(48px, 9vw, 110px)',
-                  fontWeight: 900,
-                  letterSpacing: '-0.04em',
-                  color: textColor,
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  lineHeight: 1,
-                }}
-              >
-                {ch === ' ' ? '\u00A0' : ch}
-              </span>
-            ))}
-          </div>
+      {/* Brand name — letter stagger */}
+      <div data-pp-brand style={{ overflow: 'hidden', paddingBottom: '4px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'baseline',
+          }}
+        >
+          {letters.map((ch, i) => (
+            <span
+              key={i}
+              data-pp-name
+              style={{
+                display: 'inline-block',
+                opacity: 0,
+                transform: 'translateY(42px)',
+                fontSize: 'clamp(48px, 9vw, 110px)',
+                fontWeight: 900,
+                letterSpacing: '-0.04em',
+                color: textColor,
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                lineHeight: 1,
+              }}
+            >
+              {ch === ' ' ? '\u00A0' : ch}
+            </span>
+          ))}
         </div>
       </div>
     </div>

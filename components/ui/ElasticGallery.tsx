@@ -36,13 +36,13 @@ export default function ElasticGallery({ images, thumbImages, altPrefix = 'image
               className={s.imgThumb}
               src={thumb}
               alt={`${altPrefix} ${i + 1}`}
-              loading="lazy"
+              loading={i < 3 ? 'eager' : 'lazy'}
             />
             <img
               className={s.imgFull}
               src={url}
               alt={`${altPrefix} ${i + 1}`}
-              loading="lazy"
+              loading={i < 3 ? 'eager' : 'lazy'}
             />
             <div className={s.overlay} />
             {hasText && (
