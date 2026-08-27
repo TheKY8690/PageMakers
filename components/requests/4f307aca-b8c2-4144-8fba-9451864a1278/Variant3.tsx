@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { TemplateProps } from '@/lib/templates/types'
 import PagePreloader from './PagePreloader'
-import ExpandableGallery from '@/components/ui/ExpandableGallery'
+import ElasticGallery from '@/components/ui/ElasticGallery'
 import * as s from '@/styles/requests/4f307aca/v3.css'
 
 const VARIANT_ID = '4f307aca-v3'
@@ -24,6 +24,7 @@ export default function Variant3({
   thumbImageUrls,
   mainImageUrl,
   contacts = [],
+  websiteType,
   isPreview = false,
 }: TemplateProps) {
   const [preloaderDone, setPreloaderDone] = useState(isPreview)
@@ -171,7 +172,11 @@ export default function Variant3({
       ════════════════════════════════════════════════════════ */}
       {galleryImgs.length > 0 && (
         <section id="v3-works" className={s.reveal}>
-          <ExpandableGallery images={galleryImgs} thumbImages={thumbImageUrls} altPrefix={brandName} />
+          <ElasticGallery
+            images={galleryImgs}
+            thumbImages={thumbImageUrls}
+            altPrefix={brandName}
+          />
         </section>
       )}
 
