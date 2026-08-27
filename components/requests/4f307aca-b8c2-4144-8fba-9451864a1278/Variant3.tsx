@@ -15,6 +15,21 @@ const CONTACT_LABELS: Record<string, string> = {
   twitter: 'X', tiktok: 'TikTok',
 }
 
+function getContactHref(type: string, value: string): string | null {
+  const v = value.replace(/^@/, '')
+  switch (type) {
+    case 'instagram': return `https://instagram.com/${v}`
+    case 'phone':     return `sms:${value}`
+    case 'kakao':     return `https://open.kakao.com/o/${v}`
+    case 'youtube':   return `https://youtube.com/@${v}`
+    case 'naver':     return `https://blog.naver.com/${v}`
+    case 'facebook':  return `https://facebook.com/${v}`
+    case 'twitter':   return `https://twitter.com/${v}`
+    case 'tiktok':    return `https://tiktok.com/@${v}`
+    default:          return null
+  }
+}
+
 
 export default function Variant3({
   brandName,
@@ -196,12 +211,20 @@ export default function Variant3({
           )}
           {contacts.length > 0 && (
             <div className={s.contactsStrip}>
-              {contacts.slice(0, 3).map((c) => (
-                <div key={c.type} className={s.contactRow}>
-                  <span className={s.contactLabel}>{CONTACT_LABELS[c.type] ?? c.type}</span>
-                  <span className={s.contactValue}>{c.value}</span>
-                </div>
-              ))}
+              {contacts.slice(0, 3).map((c) => {
+                const href = getContactHref(c.type, c.value)
+                const inner = (
+                  <>
+                    <span className={s.contactLabel}>{CONTACT_LABELS[c.type] ?? c.type}</span>
+                    <span className={s.contactValue}>{c.value}</span>
+                  </>
+                )
+                return href ? (
+                  <a key={c.type} className={s.contactRow} href={href} target="_blank" rel="noopener noreferrer">{inner}</a>
+                ) : (
+                  <div key={c.type} className={s.contactRow}>{inner}</div>
+                )
+              })}
             </div>
           )}
         </div>
@@ -221,15 +244,9 @@ export default function Variant3({
         <p className={s.ctaText}>
           LET&apos;S<br />WORK?
         </p>
-        {contacts[0] ? (
-          <button className={s.ctaBtn} onClick={() => {}}>
-            GET CONNECTED
-          </button>
-        ) : (
-          <span className={s.ctaBtn}>
-            GET CONNECTED
-          </span>
-        )}
+        <a className={s.ctaBtn} href="mailto:bus1990@naver.com">
+          GET CONNECTED
+        </a>
         <span className={s.ctaDeco}>×</span>
       </section>
 
