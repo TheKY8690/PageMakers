@@ -21,6 +21,7 @@ export default function Variant3({
   brandDescription,
   brandColors,
   imageUrls,
+  thumbImageUrls,
   mainImageUrl,
   contacts = [],
   isPreview = false,
@@ -122,7 +123,7 @@ export default function Variant3({
         <div className={s.filmstrip}>
           {filmSides.slice(0, 2).map((url, i) => (
             <div key={`l${i}`} className={s.filmSide}>
-              <img className={s.filmSideImg} src={url} alt={`${brandName} ${i + 1}`} />
+              <img className={s.filmSideImg} src={url} alt={`${brandName} ${i + 1}`} loading="lazy" />
             </div>
           ))}
           <div className={s.filmCenter}>
@@ -134,7 +135,7 @@ export default function Variant3({
           </div>
           {filmSides.slice(2, 4).map((url, i) => (
             <div key={`r${i}`} className={s.filmSide}>
-              <img className={s.filmSideImg} src={url} alt={`${brandName} ${i + 3}`} />
+              <img className={s.filmSideImg} src={url} alt={`${brandName} ${i + 3}`} loading="lazy" />
             </div>
           ))}
         </div>
@@ -170,7 +171,7 @@ export default function Variant3({
       ════════════════════════════════════════════════════════ */}
       {galleryImgs.length > 0 && (
         <section id="v3-works" className={s.reveal}>
-          <ExpandableGallery images={galleryImgs} altPrefix={brandName} />
+          <ExpandableGallery images={galleryImgs} thumbImages={thumbImageUrls} altPrefix={brandName} />
         </section>
       )}
 
@@ -201,7 +202,7 @@ export default function Variant3({
         </div>
         <div className={s.statsPortrait}>
           {statsImg ? (
-            <img className={s.statsPortraitImg} src={statsImg} alt={`${brandName} portrait`} />
+            <img className={s.statsPortraitImg} src={statsImg} alt={`${brandName} portrait`} loading="lazy" />
           ) : (
             <div className={s.statsPortraitPlaceholder} />
           )}

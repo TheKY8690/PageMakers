@@ -124,10 +124,20 @@ export default async function PortfolioPage({ params }: Props) {
     ? (await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(request.mainImageUrl, 31536000)).data?.signedUrl ?? null
     : null
 
-  // Signed URLs — gallery images
+  // Signed URLs — gallery images (풀 해상도, 라이트박스용)
   const imageUrls = await Promise.all(
     (request.imageUrls ?? []).map(async (path: string) => {
       const { data } = await supabaseAdmin.storage.from('sendMe-images').createSignedUrl(path, 31536000)
+      return data?.signedUrl ?? null
+    })
+  ).then(urls => urls.filter(Boolean) as string[])
+
+  // Signed URLs — gallery thumbnails (width:900, quality:75, display용)
+  const thumbImageUrls = await Promise.all(
+    (request.imageUrls ?? []).map(async (path: string) => {
+      const { data } = await supabaseAdmin.storage
+        .from('sendMe-images')
+        .createSignedUrl(path, 31536000, { transform: { width: 900, quality: 75 } })
       return data?.signedUrl ?? null
     })
   ).then(urls => urls.filter(Boolean) as string[])
@@ -167,6 +177,7 @@ export default async function PortfolioPage({ params }: Props) {
         brandDescription={request.brandDescription}
         brandColors={request.brandColors ?? []}
         imageUrls={imageUrls}
+        thumbImageUrls={thumbImageUrls}
         mainImageUrl={mainImageUrl}
         contacts={contacts}
         websiteType={request.websiteType ?? undefined}
