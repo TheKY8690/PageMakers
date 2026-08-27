@@ -154,7 +154,7 @@ export default function Variant2({
                 transitionDelay: `${i * 0.1}s`,
               }}
             >
-              <img className={s.galleryCellImg} src={url} alt={`${brandName} ${i + 1}`} />
+              <img className={s.galleryCellImg} src={url} alt={`${brandName} ${i + 1}`} loading="lazy" />
             </div>
           ))}
         </section>
@@ -174,7 +174,7 @@ export default function Variant2({
               className={`${s.knowPhoto} ${s.reveal}`}
               style={{ ...KNOW_POSITIONS[i], transitionDelay: `${i * 0.12}s` }}
             >
-              <img className={s.knowPhotoImg} src={url} alt={`${brandName} ${i + 1}`} />
+              <img className={s.knowPhotoImg} src={url} alt={`${brandName} ${i + 1}`} loading="lazy" />
             </div>
           ))}
         </section>
@@ -188,7 +188,7 @@ export default function Variant2({
           <p className={s.bioLabel}>(About)</p>
           <div className={s.bioPortraitWrap}>
             {aboutImg ? (
-              <img className={s.bioPortraitImg} src={aboutImg} alt={`${brandName} portrait`} />
+              <img className={s.bioPortraitImg} src={aboutImg} alt={`${brandName} portrait`} loading="lazy" />
             ) : (
               <div className={s.bioPortraitPlaceholder} />
             )}
@@ -244,10 +244,10 @@ export default function Variant2({
         <div className={s.accordImg}>
           {galleryImgs.length > 0 ? (
             <img
-              key={selectedSvc}
               className={s.accordImgEl}
               src={galleryImgs[selectedSvc % galleryImgs.length]}
               alt={SERVICES[selectedSvc].title}
+              loading="lazy"
             />
           ) : (
             <div className={s.accordImgPlaceholder} />

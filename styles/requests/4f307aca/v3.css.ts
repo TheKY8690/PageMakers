@@ -338,7 +338,7 @@ export const contactsStrip = style({
   gap: '12px',
 })
 
-export const contactRow   = style({ display: 'flex', gap: '16px', alignItems: 'baseline' })
+export const contactRow   = style({ display: 'flex', gap: '16px', alignItems: 'baseline', color: 'inherit', textDecoration: 'none', cursor: 'pointer' })
 
 export const contactLabel = style({
   fontSize: '9px',

@@ -7,7 +7,8 @@ export interface TemplateProps {
   brandName: string
   brandDescription: string
   brandColors: string[]
-  imageUrls: string[]         // gallery signed URLs
+  imageUrls: string[]          // gallery signed URLs (풀 해상도, 라이트박스용)
+  thumbImageUrls?: string[]    // gallery display용 리사이즈 URL (width:900)
   mainImageUrl?: string | null // hero signed URL
   contacts?: Contact[]
   websiteType?: string

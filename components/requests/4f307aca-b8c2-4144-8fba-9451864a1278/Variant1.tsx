@@ -292,7 +292,7 @@ export default function Variant1({
         <div className={s.introGrid}>
           {gridImgs.map((url, i) => (
             <div key={i} className={s.introCell}>
-              <img className={s.introCellImg} src={url} alt={`${brandName} ${i + 1}`} />
+              <img className={s.introCellImg} src={url} alt={`${brandName} ${i + 1}`} loading="lazy" />
             </div>
           ))}
         </div>
@@ -322,7 +322,7 @@ export default function Variant1({
                 </div>
                 <span className={s.workCount}>{i + 1}/{workImgs.length}</span>
                 <div className={s.workPreview}>
-                  <img className={s.workPreviewImg} src={url} alt={WORK_TITLES[titleIdx]} />
+                  <img className={s.workPreviewImg} src={url} alt={WORK_TITLES[titleIdx]} loading="lazy" />
                 </div>
               </div>
             )
@@ -379,7 +379,7 @@ export default function Variant1({
           <div>
             {aboutImg && (
               <div data-v1-about-item className={s.aboutImgWrap}>
-                <img className={s.aboutImg} src={aboutImg} alt={`${brandName} about`} />
+                <img className={s.aboutImg} src={aboutImg} alt={`${brandName} about`} loading="lazy" />
               </div>
             )}
             <div>
